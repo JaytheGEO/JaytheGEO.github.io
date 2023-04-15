@@ -1,31 +1,104 @@
 <html>
 <head>
-  <title>My first map</title>
+  <title>Lab 4 Part 1</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
      crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
     integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
     crossorigin=""></script>
-  <style>
-    #map{ width: 900px; height: 500px; }
-  </style>
-</head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="leaflet-heat.js"></script>
+   <style>
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+} 
 
-<body>
+.legend {
+text-align: left; line-height: 18px; color: #555; }
+.legend i {
+width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }  
+
+</style>
+
+  
+  <style>
+
+    #map{ width: 600px; height: 400px; }
+  </style>
+</head> 
+
+<body> 
 
   <div id="map"></div>
-
-  <script>
+<script
+       src="http://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js">
+    </script>
+<script type="text/javascript" src="secondEd.geojson"></script>
+  <script> 
 
   // initialize the map
-  var map = L.map('map').setView([40.1020, -88.2272], 13);
+  var map = L.map('map').setView([40, -89], 6); 
 
   // load a tile layer
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+}).addTo(map); 
 
-  </script>
+  
+  
+$.getJSON("https://gist.githubusercontent.com/raechelportelli/91c6caf9af3daf85a7a2fe1eec079a10/raw/28c42649557d8e286c54bc9ef97af4c17bafdd96/secondEd.geojson",
+function(data) {
+
+var geojsonLayer = L.geoJSON(null, {
+
+
+
+
+			onEachFeature: function(feature) {
+
+
+				// Optional: add popups or other interactions to each feature
+
+
+			}
+
+
+		}).addTo(map);
+
+geojsonLayer.addData(data);
+
+
+var heatData = [];
+geojsonLayer.eachLayer(function(layer) {
+var latlng = layer.getLatLng();
+var value = layer.value;
+heatData.push([latlng.lat, latlng.lng, value]);
+});
+
+var heatLayer = L.heatLayer(heatData, {
+radius: 100,
+blur: 10,
+opacity: 1,
+maxZoom: 17,
+max: 4.0,
+
+gradient: {
+0.0: 'green',
+0.5: 'yellow',
+1.0: 'red'}
+        
+}).addTo(map);
+});
+</script>
 </body>
 </html>
