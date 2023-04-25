@@ -54,6 +54,9 @@
 	
 	<div id="mapContainer">
 		<div id="map" class="mapArea">
+			<div class="trace"></div>
+			<div class="map"></div>
+		</div>
 
 
 	<select id="traceSelect" class="traceSelect" onChange="trace_selected()">
@@ -62,8 +65,7 @@
 	</select>
 		
 			<div class="map"></div>
-			<script type="text/javascript" src="GEO_JSON_Cook.js"></script>
-	                <script type="text/javascript" src="GEO_VARIABLES_Cook.js"></script>
+	
 		</div>
 	</div>
 
@@ -125,9 +127,9 @@ function entryPoint() {
 	app.map = draw_baseMap("map");
 	var e = document.getElementById("traceSelect");
 	var trace = e.options[e.selectedIndex].value; 
-	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
+	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE)
 	app.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
-	draw_choroplethMap(trace);
+	draw_choroplethMap(TRACE);
 
 }
 
@@ -226,8 +228,101 @@ function draw_baseMap(mDIV="map") {
  * intervals: intervals by number of class that result of classification
  * colors   : color hue
  */
-function draw_choroplethMap(map, item, assembledGeoJSON, intervals, colors) {
+function draw_choroplethMap(item) {
+	
+	// control that shows state info on hover
+	if (app.info != null) app.info.remove();
+	app.info = L.control();
+	app.info.onAdd = function(map) {
+		this._div = L.DomUtil.create('div', 'info');
+		this.update();
+		return this._div;
+	};
+	app.info.update = function (props) {
+		this._div.innerHTML = '<h4>' + item + '</h4>' +  (props ?
+			props.geoid + ' :&nbsp; &nbsp;' + ((props[item] == NO_DATA) ? "no data" : '<b>' + props[item] + '</b>')
+			: 'Hover over an area');
+	};
+	app.info.addTo(app.map);
+	
+	// get getOpacity
+	function getOpacity(feature) {
+		return 0.9;
+	}
+	
+	// get color depending on selected variable's value
+	function getColor(d) {
+		if (d == NO_DATA) {
+			return "#5E5E5E";
+		}
+		for (var i=app.colors.length-1; i>=0; i--) {
+			if (d >= app.intervals[i]) {
+				return app.colors[i];
+			}
+		}
+	}
+	
+	function style(feature) {
+		return {
+			weight: 0.3,
+			opacity: 1,
+			color: 'white',
+			dashArray: '1',
+			fillOpacity: getOpacity(feature),
+			fillColor: getColor(feature.properties[item])
+		};
+	}
+	
+	function highlightFeature(e) {
+		var layer = e.target;
+		layer.setStyle({
+			weight: 3,
+			color: '#00ffff',
+			dashArray: '',
+			fillOpacity: 0.9
+		});
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+		app.info.update(layer.feature.properties);
+	}
+	
+	function resetHighlight(e) {
+		geojson.resetStyle(e.target);
+		app.info.update();
+	}
 
+	function zoomToFeature(e) {
+		app.map.fitBounds(e.target.getBounds());
+	}
+	
+	function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			click: zoomToFeature
+		});
+	}
+	
+	var geojson = L.geoJson(app.assembledGeoJSON, {
+		style: style,
+		onEachFeature: onEachFeature
+	}).addTo(app.map);
+	
+	app.map.fitBounds(geojson.getBounds());                              // fit bounds from geojson object
+	
+	if (app.legend != null) app.legend.remove();
+	app.legend = L.control({position: 'bottomright'});
+	app.legend.onAdd = function (map) {
+		var div = L.DomUtil.create('div', 'info legend');
+		var labels = [];
+		for (var i=0; i<app.colors.length; i++)
+			labels.push('<i style="background:' + app.colors[i] + '"></i>&nbsp; &nbsp;' + app.intervals[i].toFixed(2));
+		labels.push('<i style="background:' + getColor(NO_DATA) + '"></i>&nbsp; ' + 'no data'+ '<br>');
+		div.innerHTML = labels.join('<br>');
+		return div;
+	};
+	app.legend.addTo(app.map);
 }
 
 </script>
