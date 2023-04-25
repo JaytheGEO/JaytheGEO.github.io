@@ -52,20 +52,15 @@
 
 <body onload="entryPoint()">
 	
+	<h1>A choropleth Map with 2D Histogram Contour Plot</h1>
+	
 	<div id="mapContainer">
 		<div id="map" class="mapArea">
 			<div class="trace"></div>
 			<div class="map"></div>
 		</div>
-
-
-	<select id="traceSelect" class="traceSelect" onChange="trace_selected()">
-		<option value="% White" selected>% Hispanic</option>
-		<option value="% Black" >% Black</option>
-	</select>
-		
-			<div class="map"></div>
-	
+		<div id="chart" class="mapArea">
+			<div class="chart"></div>
 		</div>
 	</div>
 
@@ -73,11 +68,12 @@
 <script type="text/javascript">
 
 // define global variables
-var NO_DATA = -9999;
-var TRACE = "% Hispanic";
+var TRACE1 = "% White";
+var TRACE2 = "% Black";
 var NUMBER_OF_CLASS = 8;                                      // range: 5 ~ 9
-var CLASSIFICATION_METHOD = "Jenks"                        // Equal, Quantile or Jenks
-var COLOR_HUE = "Blue";                              // Red, Green or Blue
+var CLASSIFICATION_METHOD = "Quantile"                        // Equal, Quantile or Jenks
+var COLOR_HUE = "Yellow_to_Red";                              // Red, Green or Blue
+var NO_DATA = -9999;
 var COLOR_CLASS = {
 	"Red_5"     : ["#fee5d9", "#fcae91", "#fb6a4a", "#de2d26", "#a50f15"],
 	"Red_6"     : ["#fee5d9", "#fcbba1", "#fc9272", "#fb6a4a", "#de2d26", "#a50f15"],
@@ -95,42 +91,41 @@ var COLOR_CLASS = {
 	"Blue_8"    : ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#084594"],
 	"Blue_9"    : ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"],
 	//multi-hue
-	"Yellow_to_Red_5"    : ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"],
-	"Yellow_to_Red_6"    : ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"],
-	"Yellow_to_Red_7"    : ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"],
-	"Yellow_to_Red_8"    : ["#ffffcc" ,"#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"],
-   	"Yellow_to_Red_9"    : ["#ffffcc" ,"#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"],	
+	"Yellow_to_Red_5" : ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"],
+	"Yellow_to_Red_6" : ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"],
+	"Yellow_to_Red_7" : ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"],
+	"Yellow_to_Red_8" : ["#ffffcc" ,"#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"],
+   	"Yellow_to_Red_9" : ["#ffffcc" ,"#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]	
 };
+// changeable global variables
+var app = {
+	"map": null,                                                     // leaflet object of map
+	"assembledGeoJSON": null,                                        // GeoJSON format with properties and geometry data
+	"intervals": null,                                               // intervals by classification
+	"colors": null,                                                  // color hue
+	"info": null,                                                    // leaflet object of info
+	"legend": null,                                                  // leaflet object of legend
+}
 // end of global variables
 
-var assembledGeoJSON
-var intervals
-var colors
-var map
 
-function trace_selected() {
-	var e = document.getElementById("traceSelect");
-	var trace = e.options[e.selectedIndex].value;
-	console.log(map, TRACE, assembledGeoJSON, intervals, colors)
-	TRACE = trace
-	draw_choroplethMap(map, TRACE, assembledGeoJSON, intervals, colors);
-}
 
 /**
  * entry point of this javascript
  * it's defined by <body> tag like this: <body onload="entryPoint()">
  */
-function entryPoint() {	
+function entryPoint() {
 	
 	app.assembledGeoJSON = assembleGeoJSON(GEO_JSON, GEO_VARIABLES);
 	
 	app.map = draw_baseMap("map");
 	var e = document.getElementById("traceSelect");
 	var trace = e.options[e.selectedIndex].value; 
-	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE)
+	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
 	app.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
-	draw_choroplethMap(TRACE);
-
+	draw_choroplethMap(trace);
+	
+	draw_2dDensityPlots(TRACE1, TRACE2);
 }
 
 
@@ -159,8 +154,7 @@ function assembleGeoJSON(geoJSON, geoVariables) {
 		resultGeoJSON.features.push(feature);
 	});
 	
-	return resultGeoJSON;	
-	
+	return resultGeoJSON;
 }
 
 
@@ -168,10 +162,9 @@ function assembleGeoJSON(geoJSON, geoVariables) {
  * get intervals from classification
  * method : "Equal", "Quantile" or "Jenks"
  * nClass : number of class for classification.
- * geoJSON: GeoJSON format with properties and geometry data
  * item   : selected variable == TRACE.
  */
-function classification(method, nClass, geoJSON, item) {
+function classification(method, nClass, item) {
 	
 	var values = [];
 	app.assembledGeoJSON.features.forEach(function(feature, i) {                  // skip if NO_DATA
@@ -186,7 +179,6 @@ function classification(method, nClass, geoJSON, item) {
 	if (method == 'Jenks')      intervals = serie.getClassJenks(nClass);
 	
 	return intervals;
-
 }
 
 
@@ -195,7 +187,14 @@ function classification(method, nClass, geoJSON, item) {
  * mDIV: id of <div> tag where to draw the map
  * return leaflet object of map
  */
-function draw_baseMap(mDIV="map") {
+function draw_baseMap(mDIV) {
+
+	var traceDiv = document.getElementById(mDIV).getElementsByClassName("trace")[0];
+	var html_trace = 'Trace: <select id="traceSelect" class="traceSelect" onChange="trace_selected()">';
+	html_trace += '<option value="' + TRACE1 + '" class="line_none">' + TRACE1 + '</option>';
+	html_trace += '<option value="' + TRACE2 + '" class="line_none">' + TRACE2 + '</option>';
+	html_trace += '</select>';
+	traceDiv.innerHTML = html_trace;
 	
 	var mapDiv = document.getElementById(mDIV).getElementsByClassName("map")[0];
 	var mbAttr = 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
@@ -217,16 +216,26 @@ function draw_baseMap(mDIV="map") {
 	map.scrollWheelZoom.disable();
 	
 	return map;	
-		
+}
+
+
+/**
+ * this function inboked by trace select in the drop-down list
+ * update app.intervals by selected trace
+ * call the draw_choroplethMap function
+ */
+function trace_selected() {
+	
+	var e = document.getElementById("traceSelect");
+	var trace = e.options[e.selectedIndex].value;
+	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
+	draw_choroplethMap(trace);
 }
 
 
 /**
  * draw a choropleth map
- * map      : leaflet object of map
- * item     : selected variable == TRACE.  
- * intervals: intervals by number of class that result of classification
- * colors   : color hue
+ * item: selected trace  
  */
 function draw_choroplethMap(item) {
 	
@@ -323,6 +332,94 @@ function draw_choroplethMap(item) {
 		return div;
 	};
 	app.legend.addTo(app.map);
+}
+
+
+/**
+ * draw a choropleth map
+ * item: selected trace  
+ */
+function draw_2dDensityPlots(t1, t2, cDIV="chart") {
+	
+	var chartDiv = document.getElementById(cDIV).getElementsByClassName("chart")[0];
+	
+	var x = [];
+	var y = [];
+	app.assembledGeoJSON.features.forEach(function(feature, i) {
+		if (feature.properties[t1] != NO_DATA) x.push(feature.properties[t1]);
+		if (feature.properties[t2] != NO_DATA) y.push(feature.properties[t2]);
+	});
+	
+	var trace1 = {
+		x: x,
+		y: y,
+		mode: 'markers',
+		name: 'points',
+		marker: {
+			color: 'rgb(102,0,0)',
+			size: 2,
+			opacity: 0.4
+		},
+		type: 'scatter'
+	};
+	var trace2 = {
+		x: x,
+		y: y,
+		name: 'density',
+		ncontours: 20,
+		colorscale: 'Hot',
+		reversescale: true,
+		showscale: false,
+		type: 'histogram2dcontour'
+	};
+	var trace3 = {
+		x: x,
+		name: 'x density',
+		marker: {color: 'rgb(102,0,0)'},
+		yaxis: 'y2',
+		type: 'histogram'
+	};
+	var trace4 = {
+		y: y,
+		name: 'y density',
+		marker: {color: 'rgb(102,0,0)'},
+		xaxis: 'x2',
+		type: 'histogram'
+	};
+	var data = [trace1, trace2, trace3, trace4];
+	var layout = {
+		//title: "2D Histogram Contour Plot with Histogram Subplots",
+		showlegend: false,
+		autosize: false,
+		width: chartDiv.clientWidth,
+		height: chartDiv.clientHeight,
+		margin: {t: 50},
+		hovermode: 'closest',
+		bargap: 0,
+		xaxis: {
+			title: t1,
+			domain: [0, 0.85],
+			showgrid: false,
+			zeroline: false
+		},
+		yaxis: {
+			title: t2,
+			domain: [0, 0.85],
+			showgrid: false,
+			zeroline: false
+		},
+		xaxis2: {
+			domain: [0.85, 1],
+			showgrid: false,
+			zeroline: false
+		},
+		yaxis2: {
+			domain: [0.85, 1],
+			showgrid: false,
+			zeroline: false
+		}
+	};
+	Plotly.newPlot(chartDiv, data, layout);
 }
 
 </script>
