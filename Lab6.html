@@ -115,6 +115,15 @@ function trace_selected() {
  * it's defined by <body> tag like this: <body onload="entryPoint()">
  */
 function entryPoint() {	
+	
+	app.assembledGeoJSON = assembleGeoJSON(GEO_JSON, GEO_VARIABLES);
+	
+	app.map = draw_baseMap("map");
+	var e = document.getElementById("traceSelect");
+	var trace = e.options[e.selectedIndex].value; 
+	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
+	app.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
+	draw_choroplethMap(trace);
 
 }
 
@@ -125,6 +134,26 @@ function entryPoint() {
  * geoVariables: CSV format first column of each row must be geoid
  */
 function assembleGeoJSON(geoJSON, geoVariables) {
+	
+	var geoFeatures = {}                                             // key: geoid,  value: {geometry, properties}
+	geoJSON.features.forEach(function(row, i) {
+		geoFeatures[row.properties.geoid] = {"geometry": row.geometry, "properties": row.properties}
+	});
+	
+	var title = geoVariables[0];                                     // save 1st row to a title
+	var resultGeoJSON = {"type":"FeatureCollection", "features":[]}
+	geoVariables.forEach(function(row, i) {
+		if (i == 0) return;                                          // skip the title's row
+		var geoid = row[0];
+		if (!geoFeatures.hasOwnProperty(geoid)) return;              // skip if no geometry data in the geoJSON
+		var geoFeature = geoFeatures[geoid];
+		var feature = {"type": "Feature", "geometry": geoFeature.geometry, "properties": geoFeature.properties};
+		for (var c=1; c<title.length; c++) 
+			feature.properties[title[c]] = row[c];
+		resultGeoJSON.features.push(feature);
+	});
+	
+	return resultGeoJSON;	
 	
 }
 
@@ -137,6 +166,20 @@ function assembleGeoJSON(geoJSON, geoVariables) {
  * item   : selected variable == TRACE.
  */
 function classification(method, nClass, geoJSON, item) {
+	
+	var values = [];
+	app.assembledGeoJSON.features.forEach(function(feature, i) {                  // skip if NO_DATA
+		if (feature.properties[item] != NO_DATA) values.push(feature.properties[item]);
+	});
+	
+	var serie = new geostats();
+	serie.setSerie(values);
+	var intervals = [];
+	if (method == 'Equal')      intervals = serie.getClassEqInterval(nClass);
+	if (method == 'Quantile')   intervals = serie.getClassQuantile(nClass);
+	if (method == 'Jenks')      intervals = serie.getClassJenks(nClass);
+	
+	return intervals;
 
 }
 
@@ -147,6 +190,27 @@ function classification(method, nClass, geoJSON, item) {
  * return leaflet object of map
  */
 function draw_baseMap(mDIV="map") {
+	
+	var mapDiv = document.getElementById(mDIV).getElementsByClassName("map")[0];
+	var mbAttr = 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		mbUrl = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
+
+	var grayscale   = L.tileLayer(mbUrl, {id: 'mapbox/light-v9', tileSize: 512, zoomOffset: -1, attribution: mbAttr}),
+		streets  = L.tileLayer(mbUrl, {id: 'mapbox/streets-v11', tileSize: 512, zoomOffset: -1, attribution: mbAttr});
+	
+	var mapCenter = [37.09024, -95.712891];
+	var mapZoomLevel = 4;
+	var map = L.map(mapDiv, {
+		center: mapCenter,
+		zoom: mapZoomLevel,
+		layers: [grayscale]
+	});
+	
+	map.scrollWheelZoom.disable();
+	
+	return map;	
 		
 }
 
