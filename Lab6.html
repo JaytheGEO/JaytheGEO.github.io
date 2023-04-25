@@ -3,7 +3,8 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Choropleth Map</title>
-
+	<script type="text/javascript" src="GEO_JSON_Cook.js"></script>
+	<script type="text/javascript" src="GEO_VARIABLES_Cook.js"></script>
 	<script src="GEO_JSON_Cook.js"></script>
 	<script src="GEO_VARIABLES_Cook.js"></script>
 	
@@ -60,8 +61,6 @@
 	</select>
 		
 			<div class="map"></div>
-			<script type="text/javascript" src="GEO_JSON_Cook.js"></script>
-			<script type="text/javascript" src="GEO_VARIABLES_Cook.js"></script>
 		</div>
 	</div>
 
@@ -105,11 +104,11 @@ var colors
 var map
 
 function trace_selected() {
-	var e = document.getElementById("traceSelect");
-	var trace = e.options[e.selectedIndex].value;
-	console.log(map, TRACE, assembledGeoJSON, intervals, colors)
+	var GEO_VARIABLES = document.getElementById("traceSelect");
+	var trace = GEO_VARIABLES.options[GEO_VARIABLES.selectedIndex].value;
+	console.log(map, % Hispanic, GEO_JSON, 8, Blue)
 	TRACE = trace
-	draw_choroplethMap(map, TRACE, assembledGeoJSON, intervals, colors);
+	draw_choroplethMap(map, % Hispanic, GEO_JSON, 8, Blue);
 }
 
 /**
@@ -138,7 +137,7 @@ function assembleGeoJSON(GEO_JSON, GEO_VARIABLES) {
  * geoJSON: GeoJSON format with properties and geometry data
  * item   : selected variable == TRACE.
  */
-function classification("Jenks", 8, GEO_JSON, item) {
+function classification("Jenks", 8, GEO_JSON, % Hispanic) {
 
 }
 
