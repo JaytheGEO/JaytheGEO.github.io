@@ -128,7 +128,7 @@ function entryPoint() {
 	
 	app.assembledGeoJSON = assembleGeoJSON(GEO_JSON, GEO_VARIABLES);
 	
-	app.map = draw_baseMap("map");
+	app.map = draw_baseMap("map1");
 	var e = document.getElementById("traceSelect");
 	var trace = e.options[e.selectedIndex].value; 
 	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
@@ -136,7 +136,7 @@ function entryPoint() {
 	draw_choroplethMap(TRACE1);
 	
 	
-	app.map = draw_baseMap("map");
+	app.map = draw_baseMap("map2");
 	var e = document.getElementById("traceSelect");
 	var trace = e.options[e.selectedIndex].value; 
 	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE2)
