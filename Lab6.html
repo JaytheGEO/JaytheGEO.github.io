@@ -126,18 +126,31 @@ var app = {
  */
 function entryPoint() {
 	
-	
 	app.assembledGeoJSON = assembleGeoJSON(GEO_JSON, GEO_VARIABLES);
 	
-	app.map = draw_baseMap("map");
-	var e = document.getElementById("traceSelect");
-	var trace = e.options[e.selectedIndex].value; 
-	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
-	app.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
-	draw_choroplethMap(trace);
+	var map = "map1";
+	app[map] = {};
+	var mapN = app[map];
 	
-	draw_2dDensityPlots(TRACE1, TRACE2);
-}
+	mapN.map = draw_baseMap(map, GEO_VARIABLES[0], TRACE1);
+	var e = document.getElementById(map).getElementsByClassName("traceSelect")[0];
+	var trace = e.options[e.selectedIndex].value;
+	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
+	mapN.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
+	draw_choroplethMap(mapN, trace);
+	
+	var map = "map2";
+	app[map] = {};
+	var mapN = app[map];
+	
+	mapN.map = draw_baseMap(map, GEO_VARIABLES[0], TRACE2);
+	var e = document.getElementById(map).getElementsByClassName("traceSelect")[0];
+	var trace = e.options[e.selectedIndex].value;
+	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
+	mapN.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
+	draw_choroplethMap(mapN, trace);
+	
+	draw_2dDensityPlots();
 
 
 /**
@@ -198,12 +211,18 @@ function classification(method, nClass, item) {
  * mDIV: id of <div> tag where to draw the map
  * return leaflet object of map
  */
-function draw_baseMap(mDIV) {
+function draw_baseMap(mDIV, variables, trace) {
 
 	var traceDiv = document.getElementById(mDIV).getElementsByClassName("trace")[0];
-	var html_trace = 'Trace: <select id="traceSelect" class="traceSelect" onChange="trace_selected()">';
-	html_trace += '<option value="' + TRACE1 + '" class="line_none">' + TRACE1 + '</option>';
-	html_trace += '<option value="' + TRACE2 + '" class="line_none">' + TRACE2 + '</option>';
+	var html_trace = 'Trace: <select id="traceSelect" class="traceSelect" onChange="trace_selected(\''+mDIV+'\')">';
+	//html_trace += '<option value="' + TRACE1 + '" class="line_none">' + TRACE1 + '</option>';
+	//html_trace += '<option value="' + TRACE2 + '" class="line_none">' + TRACE2 + '</option>';
+	for (var i=1; i<variables.length; i++) {
+		if (variables[i] == trace)
+			html_trace += '<option value="' + variables[i] + '" class="line_none" selected>' + variables[i] + '</option>';
+		else
+			html_trace += '<option value="' + variables[i] + '" class="line_none">' + variables[i] + '</option>';
+	}
 	html_trace += '</select>';
 	traceDiv.innerHTML = html_trace;
 	
@@ -229,23 +248,21 @@ function draw_baseMap(mDIV) {
 	return map;	
 }
 
-
 /**
  * this function inboked by trace select in the drop-down list
  * update app.intervals by selected trace
  * call the draw_choroplethMap function
  */
-function trace_selected() {
+function trace_selected(mDIV) {
 	
-	var e = document.getElementById("traceSelect");
-	var trace = e.options[e.selectedIndex].value;
-	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
-	draw_choroplethMap(TRACE1);
+	var mapN = app[mDIV];
 	
-	var e = document.getElementById("traceSelect");
+	var e = document.getElementById(mDIV).getElementsByClassName("traceSelect")[0];
 	var trace = e.options[e.selectedIndex].value;
-	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE2)
-	draw_choroplethMap(TRACE2);
+	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
+	draw_choroplethMap(mapN, trace);
+	
+	draw_2dDensityPlots();
 }
 
 
@@ -253,22 +270,22 @@ function trace_selected() {
  * draw a choropleth map
  * item: selected trace  
  */
-function draw_choroplethMap(item) {
+function draw_choroplethMap(mapN, item) {
 	
 	// control that shows state info on hover
-	if (app.info != null) app.info.remove();
-	app.info = L.control();
-	app.info.onAdd = function(map) {
+	if (mapN.hasOwnProperty("info") && mapN.info != null) mapN.info.remove();
+	mapN.info = L.control();
+	mapN.info.onAdd = function(map) {
 		this._div = L.DomUtil.create('div', 'info');
 		this.update();
 		return this._div;
 	};
-	app.info.update = function (props) {
+	mapN.info.update = function (props) {
 		this._div.innerHTML = '<h4>' + item + '</h4>' +  (props ?
 			props.geoid + ' :&nbsp; &nbsp;' + ((props[item] == NO_DATA) ? "no data" : '<b>' + props[item] + '</b>')
 			: 'Hover over an area');
 	};
-	app.info.addTo(app.map);
+	mapN.info.addTo(mapN.map);
 	
 	// get getOpacity
 	function getOpacity(feature) {
@@ -280,9 +297,9 @@ function draw_choroplethMap(item) {
 		if (d == NO_DATA) {
 			return "#5E5E5E";
 		}
-		for (var i=app.colors.length-1; i>=0; i--) {
-			if (d >= app.intervals[i]) {
-				return app.colors[i];
+		for (var i=mapN.colors.length-1; i>=0; i--) {
+			if (d >= mapN.intervals[i]) {
+				return mapN.colors[i];
 			}
 		}
 	}
@@ -309,16 +326,16 @@ function draw_choroplethMap(item) {
 		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
 			layer.bringToFront();
 		}
-		app.info.update(layer.feature.properties);
+		mapN.info.update(layer.feature.properties);
 	}
 	
 	function resetHighlight(e) {
 		geojson.resetStyle(e.target);
-		app.info.update();
+		mapN.info.update();
 	}
 
 	function zoomToFeature(e) {
-		app.map.fitBounds(e.target.getBounds());
+		mapN.map.fitBounds(e.target.getBounds());
 	}
 	
 	function onEachFeature(feature, layer) {
@@ -332,22 +349,22 @@ function draw_choroplethMap(item) {
 	var geojson = L.geoJson(app.assembledGeoJSON, {
 		style: style,
 		onEachFeature: onEachFeature
-	}).addTo(app.map);
+	}).addTo(mapN.map);
 	
-	app.map.fitBounds(geojson.getBounds());                              // fit bounds from geojson object
+	mapN.map.fitBounds(geojson.getBounds());                              // fit bounds from geojson object
 	
-	if (app.legend != null) app.legend.remove();
-	app.legend = L.control({position: 'bottomright'});
-	app.legend.onAdd = function (map) {
+	if (mapN.hasOwnProperty("legend") && mapN.legend != null) mapN.legend.remove();
+	mapN.legend = L.control({position: 'bottomright'});
+	mapN.legend.onAdd = function (map) {
 		var div = L.DomUtil.create('div', 'info legend');
 		var labels = [];
-		for (var i=0; i<app.colors.length; i++)
-			labels.push('<i style="background:' + app.colors[i] + '"></i>&nbsp; &nbsp;' + app.intervals[i].toFixed(2));
+		for (var i=0; i<mapN.colors.length; i++)
+			labels.push('<i style="background:' + mapN.colors[i] + '"></i>&nbsp; &nbsp;' + mapN.intervals[i].toFixed(2));
 		labels.push('<i style="background:' + getColor(NO_DATA) + '"></i>&nbsp; ' + 'no data'+ '<br>');
 		div.innerHTML = labels.join('<br>');
 		return div;
 	};
-	app.legend.addTo(app.map);
+	mapN.legend.addTo(mapN.map);
 }
 
 
