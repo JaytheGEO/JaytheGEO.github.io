@@ -100,21 +100,12 @@ var COLOR_CLASS = {
 };
 // changeable global variables
 var app = {
+	"map": null,                                                     // leaflet object of map
 	"assembledGeoJSON": null,                                        // GeoJSON format with properties and geometry data
-	"map": {
-		"map": null,                                                 // leaflet object of map
-		"intervals": null,                                           // intervals by classification
-		"colors": null,                                              // color hue
-		"info": null,                                                // leaflet object of info
-		"legend": null,                                              // leaflet object of legend
-	},
-	"map2": {
-		"map": null,                                                 // leaflet object of map
-		"intervals": null,                                           // intervals by classification
-		"colors": null,                                              // color hue
-		"info": null,                                                // leaflet object of info
-		"legend": null,                                              // leaflet object of legend
-	},
+	"intervals": null,                                               // intervals by classification
+	"colors": null,                                                  // color hue
+	"info": null,                                                    // leaflet object of info
+	"legend": null,                                                  // leaflet object of legend
 }
 // end of global variables
 
@@ -128,27 +119,12 @@ function entryPoint() {
 	
 	app.assembledGeoJSON = assembleGeoJSON(GEO_JSON, GEO_VARIABLES);
 	
-	var map = "map";
-	app[map] = {};
-	var mapN = app[map];
-	
-	mapN.map = draw_baseMap(map, GEO_VARIABLES[0], TRACE1);
-	var e = document.getElementById(map).getElementsByClassName("traceSelect")[0];
-	var trace = e.options[e.selectedIndex].value;
-	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
-	mapN.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
+	app.map = draw_baseMap("map");
+	var e = document.getElementById("traceSelect");
+	var trace = e.options[e.selectedIndex].value; 
+	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
+	app.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
 	draw_choroplethMap(TRACE1);
-	
-	var map = "map";
-	app[map] = {};
-	var mapN = app[map];
-	
-	mapN.map = draw_baseMap(map, GEO_VARIABLES[0], TRACE2);
-	var e = document.getElementById(map).getElementsByClassName("traceSelect")[0];
-	var trace = e.options[e.selectedIndex].value;
-	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE2)
-	mapN.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
-	draw_choroplethMap(TRACE2);
 	
 	draw_2dDensityPlots(TRACE1, TRACE2);
 }
@@ -254,7 +230,12 @@ function trace_selected() {
 	var e = document.getElementById("traceSelect");
 	var trace = e.options[e.selectedIndex].value;
 	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
-	draw_choroplethMap(TRACE1, TRACE2);
+	draw_choroplethMap(TRACE1);
+	
+	var e = document.getElementById("traceSelect");
+	var trace = e.options[e.selectedIndex].value;
+	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE2)
+	draw_choroplethMap(TRACE2);
 }
 
 
