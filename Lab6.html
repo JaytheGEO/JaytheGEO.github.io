@@ -100,20 +100,20 @@ var COLOR_CLASS = {
 };
 // changeable global variables
 var app = {
-	"map1": null,                                                     // leaflet object of map
 	"assembledGeoJSON": null,                                        // GeoJSON format with properties and geometry data
-	"intervals": null,                                               // intervals by classification
-	"colors": null,                                                  // color hue
-	"info": null,                                                    // leaflet object of info
-	"legend": null,                                                  // leaflet object of legend
-        },
-
-        "map2": null,                                                    // leaflet object of map
-	"assembledGeoJSON": null,                                        // GeoJSON format with properties and geometry data
-	"intervals": null,                                               // intervals by classification
-	"colors": null,                                                  // color hue
-	"info": null,                                                    // leaflet object of info
-	"legend": null,                                                  // leaflet object of legend
+	"map1": {
+		"map": null,                                                 // leaflet object of map
+		"intervals": null,                                           // intervals by classification
+		"colors": null,                                              // color hue
+		"info": null,                                                // leaflet object of info
+		"legend": null,                                              // leaflet object of legend
+	},
+	"map2": {
+		"map": null,                                                 // leaflet object of map
+		"intervals": null,                                           // intervals by classification
+		"colors": null,                                              // color hue
+		"info": null,                                                // leaflet object of info
+		"legend": null,                                              // leaflet object of legend
 	},
 }
 // end of global variables
