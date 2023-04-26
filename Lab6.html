@@ -100,12 +100,21 @@ var COLOR_CLASS = {
 };
 // changeable global variables
 var app = {
-	"map": null,                                                     // leaflet object of map
+	"map1": null,                                                     // leaflet object of map
 	"assembledGeoJSON": null,                                        // GeoJSON format with properties and geometry data
 	"intervals": null,                                               // intervals by classification
 	"colors": null,                                                  // color hue
 	"info": null,                                                    // leaflet object of info
 	"legend": null,                                                  // leaflet object of legend
+        },
+
+        "map2": null,                                                     // leaflet object of map
+	"assembledGeoJSON": null,                                        // GeoJSON format with properties and geometry data
+	"intervals": null,                                               // intervals by classification
+	"colors": null,                                                  // color hue
+	"info": null,                                                    // leaflet object of info
+	"legend": null,                                                  // leaflet object of legend
+	},
 }
 // end of global variables
 
@@ -119,14 +128,29 @@ function entryPoint() {
 	
 	app.assembledGeoJSON = assembleGeoJSON(GEO_JSON, GEO_VARIABLES);
 	
-	app.map = draw_baseMap("map");
-	var e = document.getElementById("traceSelect");
-	var trace = e.options[e.selectedIndex].value; 
-	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
-	app.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
-	draw_choroplethMap(TRACE1);
+	var map = "map1";
+	app[map] = {};
+	var mapN = app[map];
 	
-	draw_2dDensityPlots(TRACE1, TRACE2);
+	mapN.map = draw_baseMap(map1, GEO_VARIABLES[0], TRACE1);
+	var e = document.getElementById(map).getElementsByClassName("traceSelect")[0];
+	var trace = e.options[e.selectedIndex].value;
+	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
+	mapN.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
+	draw_choroplethMap(mapN, trace);
+	
+	var map = "map2";
+	app[map] = {};
+	var mapN = app[map];
+	
+	mapN.map = draw_baseMap(map2, GEO_VARIABLES[0], TRACE2);
+	var e = document.getElementById(map).getElementsByClassName("traceSelect")[0];
+	var trace = e.options[e.selectedIndex].value;
+	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
+	mapN.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
+	draw_choroplethMap(mapN, trace);
+	
+	draw_2dDensityPlots();
 }
 
 
@@ -345,7 +369,13 @@ function draw_choroplethMap(item) {
  * draw a choropleth map
  * item: selected trace  
  */
-function draw_2dDensityPlots(t1, t2, cDIV="chart") {
+function draw_2dDensityPlots(map1="map1", map2="map2", cDIV="chart") {
+
+	var e = document.getElementById(map1).getElementsByClassName("traceSelect")[0];
+	var t1 = e.options[e.selectedIndex].value;
+	
+	var e = document.getElementById(map2).getElementsByClassName("traceSelect")[0];
+	var t2 = e.options[e.selectedIndex].value;
 	
 	var chartDiv = document.getElementById(cDIV).getElementsByClassName("chart")[0];
 	
@@ -394,7 +424,6 @@ function draw_2dDensityPlots(t1, t2, cDIV="chart") {
 	};
 	var data = [trace1, trace2, trace3, trace4];
 	var layout = {
-		//title: "2D Histogram Contour Plot with Histogram Subplots",
 		showlegend: false,
 		autosize: false,
 		width: chartDiv.clientWidth,
@@ -425,11 +454,11 @@ function draw_2dDensityPlots(t1, t2, cDIV="chart") {
 			zeroline: false
 		}
 	};
-	Plotly.newPlot(chartDiv, data, layout);
+	
+	Plotly.newPlot(chartDiv, data, layout);	
 }
 
 </script>
 
 </body>
 </html>
-
