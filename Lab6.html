@@ -101,7 +101,7 @@ var COLOR_CLASS = {
 // changeable global variables
 var app = {
 	"assembledGeoJSON": null,                                        // GeoJSON format with properties and geometry data
-	"map1": {
+	"map": {
 		"map": null,                                                 // leaflet object of map
 		"intervals": null,                                           // intervals by classification
 		"colors": null,                                              // color hue
@@ -128,22 +128,29 @@ function entryPoint() {
 	
 	app.assembledGeoJSON = assembleGeoJSON(GEO_JSON, GEO_VARIABLES);
 	
-	app.map = draw_baseMap("map");
-	var e = document.getElementById("traceSelect");
-	var trace = e.options[e.selectedIndex].value; 
-	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
-	app.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
-	draw_choroplethMap(TRACE1);
+	var map = "map";
+	app[map] = {};
+	var mapN = app[map];
 	
+	mapN.map = draw_baseMap(map, GEO_VARIABLES[0], TRACE1);
+	var e = document.getElementById(map).getElementsByClassName("traceSelect")[0];
+	var trace = e.options[e.selectedIndex].value;
+	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
+	mapN.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
+	draw_choroplethMap(mapN, TRACE1);
 	
-	app.map = draw_baseMap("map");
-	var e = document.getElementById("traceSelect");
-	var trace = e.options[e.selectedIndex].value; 
-	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE2)
-	app.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
-	draw_choroplethMap(TRACE2);
+	var map = "map";
+	app[map] = {};
+	var mapN = app[map];
 	
-	draw_2dDensityPlots(TRACE1, TRACE2);
+	mapN.map = draw_baseMap(map, GEO_VARIABLES[0], TRACE2);
+	var e = document.getElementById(map).getElementsByClassName("traceSelect")[0];
+	var trace = e.options[e.selectedIndex].value;
+	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE2)
+	mapN.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
+	draw_choroplethMap(mapN, TRACE2);
+	
+	draw_2dDensityPlots();
 }
 
 
