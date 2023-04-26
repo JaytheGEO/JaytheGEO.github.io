@@ -137,7 +137,7 @@ function entryPoint() {
 	var trace = e.options[e.selectedIndex].value;
 	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
 	mapN.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
-	draw_choroplethMap(mapN, TRACE1);
+	draw_choroplethMap(TRACE1);
 	
 	var map = "map";
 	app[map] = {};
@@ -148,7 +148,7 @@ function entryPoint() {
 	var trace = e.options[e.selectedIndex].value;
 	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE2)
 	mapN.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
-	draw_choroplethMap(mapN, TRACE2);
+	draw_choroplethMap(TRACE2);
 	
 	draw_2dDensityPlots();
 }
