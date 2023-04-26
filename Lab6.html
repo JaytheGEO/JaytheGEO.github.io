@@ -239,7 +239,7 @@ function trace_selected() {
 	var e = document.getElementById("traceSelect");
 	var trace = e.options[e.selectedIndex].value;
 	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
-	draw_choroplethMap(TRACE1);
+	draw_choroplethMap(TRACE1, TRACE2);
 }
 
 
