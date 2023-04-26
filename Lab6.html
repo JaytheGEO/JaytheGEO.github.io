@@ -131,9 +131,9 @@ function entryPoint() {
 	app.map = draw_baseMap("map");
 	var e = document.getElementById("traceSelect");
 	var trace = e.options[e.selectedIndex].value; 
-	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
+	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
 	app.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
-	draw_choroplethMap(TRACE1);
+	draw_choroplethMap(trace);
 	
 	draw_2dDensityPlots(TRACE1, TRACE2);
 }
@@ -197,18 +197,12 @@ function classification(method, nClass, item) {
  * mDIV: id of <div> tag where to draw the map
  * return leaflet object of map
  */
-function draw_baseMap(mDIV, variables, trace) {
+function draw_baseMap(mDIV) {
 
 	var traceDiv = document.getElementById(mDIV).getElementsByClassName("trace")[0];
-	var html_trace = 'Trace: <select id="traceSelect" class="traceSelect" onChange="trace_selected(\''+mDIV+'\')">';
-	//html_trace += '<option value="' + TRACE1 + '" class="line_none">' + TRACE1 + '</option>';
-	//html_trace += '<option value="' + TRACE2 + '" class="line_none">' + TRACE2 + '</option>';
-	for (var i=1; i<variables.length; i++) {
-		if (variables[i] == trace)
-			html_trace += '<option value="' + variables[i] + '" class="line_none" selected>' + variables[i] + '</option>';
-		else
-			html_trace += '<option value="' + variables[i] + '" class="line_none">' + variables[i] + '</option>';
-	}
+	var html_trace = 'Trace: <select id="traceSelect" class="traceSelect" onChange="trace_selected()">';
+	html_trace += '<option value="' + TRACE1 + '" class="line_none">' + TRACE1 + '</option>';
+	html_trace += '<option value="' + TRACE2 + '" class="line_none">' + TRACE2 + '</option>';
 	html_trace += '</select>';
 	traceDiv.innerHTML = html_trace;
 	
@@ -234,21 +228,18 @@ function draw_baseMap(mDIV, variables, trace) {
 	return map;	
 }
 
+
 /**
  * this function inboked by trace select in the drop-down list
  * update app.intervals by selected trace
  * call the draw_choroplethMap function
  */
-function trace_selected(mDIV) {
+function trace_selected() {
 	
-	var mapN = app[mDIV];
-	
-	var e = document.getElementById(mDIV).getElementsByClassName("traceSelect")[0];
+	var e = document.getElementById("traceSelect");
 	var trace = e.options[e.selectedIndex].value;
-	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
-	draw_choroplethMap(mapN, TRACE1);
-	
-	draw_2dDensityPlots();
+	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
+	draw_choroplethMap(TRACE1);
 }
 
 
@@ -256,22 +247,22 @@ function trace_selected(mDIV) {
  * draw a choropleth map
  * item: selected trace  
  */
-function draw_choroplethMap(mapN, item) {
+function draw_choroplethMap(item) {
 	
 	// control that shows state info on hover
-	if (mapN.hasOwnProperty("info") && mapN.info != null) mapN.info.remove();
-	mapN.info = L.control();
-	mapN.info.onAdd = function(map) {
+	if (app.info != null) app.info.remove();
+	app.info = L.control();
+	app.info.onAdd = function(map) {
 		this._div = L.DomUtil.create('div', 'info');
 		this.update();
 		return this._div;
 	};
-	mapN.info.update = function (props) {
+	app.info.update = function (props) {
 		this._div.innerHTML = '<h4>' + item + '</h4>' +  (props ?
 			props.geoid + ' :&nbsp; &nbsp;' + ((props[item] == NO_DATA) ? "no data" : '<b>' + props[item] + '</b>')
 			: 'Hover over an area');
 	};
-	mapN.info.addTo(mapN.map);
+	app.info.addTo(app.map);
 	
 	// get getOpacity
 	function getOpacity(feature) {
@@ -283,9 +274,9 @@ function draw_choroplethMap(mapN, item) {
 		if (d == NO_DATA) {
 			return "#5E5E5E";
 		}
-		for (var i=mapN.colors.length-1; i>=0; i--) {
-			if (d >= mapN.intervals[i]) {
-				return mapN.colors[i];
+		for (var i=app.colors.length-1; i>=0; i--) {
+			if (d >= app.intervals[i]) {
+				return app.colors[i];
 			}
 		}
 	}
@@ -312,16 +303,16 @@ function draw_choroplethMap(mapN, item) {
 		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
 			layer.bringToFront();
 		}
-		mapN.info.update(layer.feature.properties);
+		app.info.update(layer.feature.properties);
 	}
 	
 	function resetHighlight(e) {
 		geojson.resetStyle(e.target);
-		mapN.info.update();
+		app.info.update();
 	}
 
 	function zoomToFeature(e) {
-		mapN.map.fitBounds(e.target.getBounds());
+		app.map.fitBounds(e.target.getBounds());
 	}
 	
 	function onEachFeature(feature, layer) {
@@ -335,22 +326,22 @@ function draw_choroplethMap(mapN, item) {
 	var geojson = L.geoJson(app.assembledGeoJSON, {
 		style: style,
 		onEachFeature: onEachFeature
-	}).addTo(mapN.map);
+	}).addTo(app.map);
 	
-	mapN.map.fitBounds(geojson.getBounds());                              // fit bounds from geojson object
+	app.map.fitBounds(geojson.getBounds());                              // fit bounds from geojson object
 	
-	if (mapN.hasOwnProperty("legend") && mapN.legend != null) mapN.legend.remove();
-	mapN.legend = L.control({position: 'bottomright'});
-	mapN.legend.onAdd = function (map) {
+	if (app.legend != null) app.legend.remove();
+	app.legend = L.control({position: 'bottomright'});
+	app.legend.onAdd = function (map) {
 		var div = L.DomUtil.create('div', 'info legend');
 		var labels = [];
-		for (var i=0; i<mapN.colors.length; i++)
-			labels.push('<i style="background:' + mapN.colors[i] + '"></i>&nbsp; &nbsp;' + mapN.intervals[i].toFixed(2));
+		for (var i=0; i<app.colors.length; i++)
+			labels.push('<i style="background:' + app.colors[i] + '"></i>&nbsp; &nbsp;' + app.intervals[i].toFixed(2));
 		labels.push('<i style="background:' + getColor(NO_DATA) + '"></i>&nbsp; ' + 'no data'+ '<br>');
 		div.innerHTML = labels.join('<br>');
 		return div;
 	};
-	mapN.legend.addTo(mapN.map);
+	app.legend.addTo(app.map);
 }
 
 
@@ -358,13 +349,7 @@ function draw_choroplethMap(mapN, item) {
  * draw a choropleth map
  * item: selected trace  
  */
-function draw_2dDensityPlots(map1="map1", map2="map2", cDIV="chart") {
-
-	var e = document.getElementById(map1).getElementsByClassName("traceSelect")[0];
-	var t1 = e.options[e.selectedIndex].value;
-	
-	var e = document.getElementById(map2).getElementsByClassName("traceSelect")[0];
-	var t2 = e.options[e.selectedIndex].value;
+function draw_2dDensityPlots(t1, t2, cDIV="chart") {
 	
 	var chartDiv = document.getElementById(cDIV).getElementsByClassName("chart")[0];
 	
@@ -413,6 +398,7 @@ function draw_2dDensityPlots(map1="map1", map2="map2", cDIV="chart") {
 	};
 	var data = [trace1, trace2, trace3, trace4];
 	var layout = {
+		//title: "2D Histogram Contour Plot with Histogram Subplots",
 		showlegend: false,
 		autosize: false,
 		width: chartDiv.clientWidth,
@@ -443,8 +429,7 @@ function draw_2dDensityPlots(map1="map1", map2="map2", cDIV="chart") {
 			zeroline: false
 		}
 	};
-	
-	Plotly.newPlot(chartDiv, data, layout);	
+	Plotly.newPlot(chartDiv, data, layout);
 }
 
 </script>
