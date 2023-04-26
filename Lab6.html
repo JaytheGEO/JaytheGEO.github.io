@@ -131,9 +131,9 @@ function entryPoint() {
 	app.map = draw_baseMap("map");
 	var e = document.getElementById("traceSelect");
 	var trace = e.options[e.selectedIndex].value; 
-	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
+	app.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
 	app.colors = COLOR_CLASS[COLOR_HUE + "_" + NUMBER_OF_CLASS]
-	draw_choroplethMap(trace);
+	draw_choroplethMap(TRACE1);
 	
 	draw_2dDensityPlots(TRACE1, TRACE2);
 }
@@ -245,8 +245,8 @@ function trace_selected(mDIV) {
 	
 	var e = document.getElementById(mDIV).getElementsByClassName("traceSelect")[0];
 	var trace = e.options[e.selectedIndex].value;
-	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, trace)
-	draw_choroplethMap(mapN, trace);
+	mapN.intervals = classification(CLASSIFICATION_METHOD, NUMBER_OF_CLASS, TRACE1)
+	draw_choroplethMap(mapN, TRACE1);
 	
 	draw_2dDensityPlots();
 }
