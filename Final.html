@@ -8,6 +8,7 @@
     integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
     crossorigin=""></script>
 <script src="//cdn.jsdelivr.net/leaflet.esri/1.0.3/esri-leaflet.js"></script>
+  
   <style>
     #map{ width: 600px; height: 400px; }
   </style>
@@ -27,11 +28,7 @@ L.esri.basemapLayer('Streets').addTo(map);
 
 L.geoJSON(bike_json).addTo(map);
     
-import requests
-import json_stream.requests
-
-with requests.get('https://gbfs.citibikenyc.com/gbfs/en/station_information.json', stream=True) as response:
-    data = json_stream.requests.load(response)    
+ 
   </script>
 </body>
 </html>
