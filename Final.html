@@ -19,6 +19,12 @@
 <script src="bike.js" type="text/javascript"></script>
   <script>
 
+import requests
+import json_stream.requests
+
+with requests.get('https://gbfs.citibikenyc.com/gbfs/en/station_information.json', stream=True) as response:
+    data = json_stream.requests.load(response)
+    
   // initialize the map
   var map = L.map('map').setView([40.7128, -74.0060], 10);
 
