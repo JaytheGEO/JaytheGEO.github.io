@@ -16,7 +16,7 @@
 <body>
 
   <div id="map"></div>
-<script src="bike_json.js" type="text/javascript"></script>
+<script src="bike.js" type="text/javascript"></script>
   <script>
 
   // initialize the map
@@ -25,7 +25,7 @@
   // load a tile layer
 L.esri.basemapLayer('Streets').addTo(map);
 
-L.geoJSON(PointsLayer).addTo(map);
+L.geoJSON(bike_json).addTo(map);
   </script>
 </body>
 </html>
