@@ -1,36 +1,36 @@
 <html>
 <head>
-  <title>Final Project</title>
+  <title>My first map</title>
+  
+  <script type="text/javascript" src="city.js"></script>
+  <script src="city.js"></script>
+  
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
      crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
     integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
     crossorigin=""></script>
-<script src="//cdn.jsdelivr.net/leaflet.esri/1.0.3/esri-leaflet.js"></script>
-  
   <style>
-    #map{ width: 600px; height: 400px; }
+    #map{ width: 900px; height: 500px; }
   </style>
 </head>
 
 <body>
 
   <div id="map"></div>
-<script type="text/javascript" src="station_status.js"></script>
+<script src="city.js" type="text/javascript"></script>
   <script>
-    
+
   // initialize the map
-  var map = L.map('map').setView([40.7128, -74.0060], 10);
+  var map = L.map('map').setView([40.1020, -88.2272], 4);
 
   // load a tile layer
-L.esri.basemapLayer('Streets').addTo(map);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
 
-const station = L.geoJson(station).addTo(map);
-//Remember - IllioisGJSON is the variable name inside your Lab2.JS file
-
-    
- 
+const city = L.geoJson(cities).addTo(map);    
   </script>
 </body>
 </html>
