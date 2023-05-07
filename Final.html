@@ -26,9 +26,8 @@
   var map = L.map('map').setView([26.000, -64.000], 4); 
 
   // load a tile layer
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+L.esri.basemapLayer('Streets').addTo(map);
+
 
 const city = L.geoJson(cities).addTo(map);    
   </script>
