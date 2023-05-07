@@ -1,6 +1,10 @@
 <html>
 <head>
   <title>My first map</title>
+  
+  <script type="text/javascript" src="city.js"></script>
+  <script src="city.js"></script>
+  
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
      crossorigin=""/>
@@ -26,7 +30,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-L.geoJSON(cities).addTo(map);    
+const city = L.geoJson(cities).addTo(map);    
   </script>
 </body>
 </html>
