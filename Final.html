@@ -29,6 +29,31 @@
   // load a tile layer
 L.esri.basemapLayer('Streets').addTo(map);
 
+var popup = L.popup();
+
+function onMapClick(e) {
+    popup
+        .setLatLng(e.latlng)
+        .setContent("You clicked the map at " + e.latlng.toString())
+        .openOn(map);
+}
+
+map.on('click', onMapClick);
+	  
+var info = L.control();
+
+info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+    this.update();
+    return this._div;
+};
+	  
+info.update = function (edu) {
+	const contents = edu ? `<b>${edu.EdNorm} %</b><br />${edu.CountyName}` : 'Hover over a county';
+	this._div.innerHTML = `<h4>Population with Bachelor's Degree</h4>${contents}`;
+};
+
+info.addTo(map);	  
 
 const city = L.geoJson(cities).addTo(map); 
     
