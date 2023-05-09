@@ -49,16 +49,16 @@ info.onAdd = function (map) {
 };
 	  
 info.update = function (edu) {
-	const contents = edu ? `<b>${edu.EdNorm} %</b><br />${edu.CountyName}` : 'Hover over a county';
-	this._div.innerHTML = `<h4>Population with Bachelor's Degree</h4>${contents}`;
+	const contents = edu ? `<b>${edu.EdNorm} %</b><br />${edu.CountyName}` : 'Hover over a park';
+	this._div.innerHTML = `<h4>Population around park</h4>${contents}`;
 };
 
 info.addTo(map);	  
 
 const city = L.geoJson(cities).addTo(map); 
     
-function highlightFeature(cities) {
-		var layer = cities.target;
+function highlightFeature(population) {
+		var layer = population.target;
 		layer.setStyle({
 			weight: 3,
 			color: '#00ffff',
@@ -71,13 +71,13 @@ function highlightFeature(cities) {
 		app.info.update(layer.feature.properties);
 	}
 	
-	function resetHighlight(cities) {
-		geojson.resetStyle(e.target);
+	function resetHighlight(population) {
+		geojson.resetStyle(population.target);
 		app.info.update();
 	}
 
-	function zoomToFeature(cities) {
-		app.map.fitBounds(cities.target.getBounds());
+	function zoomToFeature(population) {
+		app.map.fitBounds(population.target.getBounds());
 	}
 	
 	function onEachFeature(feature, layer) {
