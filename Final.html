@@ -85,38 +85,26 @@ layer.bringToFront();
 info.update(layer.feature.properties);
 }	  
 
-const city = L.geoJson(cities).addTo(map); 
-    
-function highlightFeature(population) {
-		var layer = population.target;
-		layer.setStyle({
-			weight: 3,
-			color: '#00ffff',
-			dashArray: '',
-			fillOpacity: 0.9
-		});
-		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-			layer.bringToFront();
-		}
-		app.info.update(layer.feature.properties);
-	}
-	
-	function resetHighlight(population) {
-		geojson.resetStyle(population.target);
-		app.info.update();
-	}
+const geojson = L.geoJson(cities).addTo(map); 
+style,
+onEachFeature
+}).addTo(map);
 
-	function zoomToFeature(population) {
-		app.map.fitBounds(population.target.getBounds());
-	}
-	
-	function onEachFeature(feature, layer) {
-		layer.on({
-			mouseover: highlightFeature,
-			mouseout: resetHighlight,
-			click: zoomToFeature
-		});
-	}  
+function resetHighlight(population) {
+geojson.resetStyle(population.target);
+info.update();
+}
+function zoomToFeature(population) {
+map.fitBounds(population.target.getBounds());
+}
+function onEachFeature(feature, layer) {
+layer.on({
+mouseover: highlightFeature,
+mouseout: resetHighlight,
+click: zoomToFeature
+});
+}	  
+	  
   </script>
 </body>
 </html>
