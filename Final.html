@@ -71,39 +71,7 @@ info.update = function (cities) {
 };
 
 info.addTo(map);	
-	  
-//INTERACTION - Highlight
-function highlightFeature(population) {
-const layer = population.target;
-layer.setStyle({
-weight: 5,
-color: '#666',
-dashArray: '',
-fillOpacity: 0.7
-}); 
-layer.bringToFront();
-info.update(layer.feature.properties);
-}	  
 
-const geojson = L.geoJson(cities).addTo(map); 
-style,
-onEachFeature
-}).addTo(map);
-
-function resetHighlight(population) {
-geojson.resetStyle(population.target);
-info.update();
-}
-function zoomToFeature(population) {
-map.fitBounds(population.target.getBounds());
-}
-function onEachFeature(feature, layer) {
-layer.on({
-mouseover: highlightFeature,
-mouseout: resetHighlight,
-click: zoomToFeature
-});
-}	  
 	  
   </script>
 </body>
