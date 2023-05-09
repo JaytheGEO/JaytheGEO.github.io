@@ -68,7 +68,7 @@ layer.bringToFront();
 info.update(layer.feature.properties);
 }	  
 
-const cities = L.geoJson(cities).addTo(map); 
+const city = L.geoJson(cities).addTo(map); 
     
 function highlightFeature(population) {
 		var layer = population.target;
