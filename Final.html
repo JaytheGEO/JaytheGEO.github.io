@@ -33,34 +33,24 @@ width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
   </style>
  
 </head>
-
 <body>
-
   <div id="map"></div>
 <script type="text/javascript" src="city.js"></script>
   <script>
-
   // initialize the map
    var map = L.map('map').setView([40, -89], 4); 
-
   // load a tile layer
 L.esri.basemapLayer('Streets').addTo(map);
-	  
-const IllinoisGeoJSON = L.geoJson(IllioisGJSON).addTo(map);	  
-
 var popup = L.popup();
-
 function onMapClick(e) {
     popup
         .setLatLng(e.latlng)
         .setContent("You clicked the map at " + e.latlng.toString())
         .openOn(map);
 }
-
 map.on('click', onMapClick);
 	  
 var info = L.control();
-
 info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
     this.update();
@@ -71,10 +61,51 @@ info.update = function (cities) {
 	const contents = cities ? `<b>${cities.population} %</b><br />${cities.name}` : 'Hover over a park';
 	this._div.innerHTML = `<h4>Population around park</h4>${contents}`;
 };
-
 info.addTo(map);	
-
 	  
+//INTERACTION - Highlight
+function highlightFeature(population) {
+const layer = population.target;
+layer.setStyle({
+weight: 5,
+color: '#666',
+dashArray: '',
+fillOpacity: 0.7
+}); 
+layer.bringToFront();
+info.update(layer.feature.properties);
+}	  
+const city = L.geoJson(cities).addTo(map); 
+    
+function highlightFeature(population) {
+		var layer = population.target;
+		layer.setStyle({
+			weight: 3,
+			color: '#00ffff',
+			dashArray: '',
+			fillOpacity: 0.9
+		});
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+		app.info.update(layer.feature.properties);
+	}
+	
+	function resetHighlight(population) {
+		geojson.resetStyle(population.target);
+		app.info.update();
+	}
+	function zoomToFeature(population) {
+		app.map.fitBounds(population.target.getBounds());
+	}
+	
+	function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			click: zoomToFeature
+		});
+	}  
   </script>
 </body>
 </html>
