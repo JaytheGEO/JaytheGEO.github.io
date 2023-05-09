@@ -32,8 +32,8 @@ L.esri.basemapLayer('Streets').addTo(map);
 
 const city = L.geoJson(cities).addTo(map); 
     
-function highlightFeature(e) {
-		var layer = e.target;
+function highlightFeature(cities) {
+		var layer = cities.target;
 		layer.setStyle({
 			weight: 3,
 			color: '#00ffff',
@@ -46,13 +46,13 @@ function highlightFeature(e) {
 		app.info.update(layer.feature.properties);
 	}
 	
-	function resetHighlight(e) {
+	function resetHighlight(cities) {
 		geojson.resetStyle(e.target);
 		app.info.update();
 	}
 
-	function zoomToFeature(e) {
-		app.map.fitBounds(e.target.getBounds());
+	function zoomToFeature(cities) {
+		app.map.fitBounds(cities.target.getBounds());
 	}
 	
 	function onEachFeature(feature, layer) {
