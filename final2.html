@@ -62,7 +62,7 @@ function onMapClick(e) {
 }
 
 map.on('click', onMapClick);
-
+	  
 var info = L.control();
 
 info.onAdd = function (map) {
@@ -70,9 +70,10 @@ info.onAdd = function (map) {
     this.update();
     return this._div;
 };
+
  
 info.update = function (cities) {
-	const contents = cities ? `<b>${city.population} </b><br />${city.name}` : 'Hover over a park';
+	const contents = cities ? `<b>${cities.population} </b><br />${cities.name}` : 'Hover over a park';
 	this._div.innerHTML = `<h4>Population around park</h4>${contents}`;
 };
 
@@ -134,7 +135,7 @@ const legend = L.control({position: 'bottomright'});
 //adds the legend to the map in a <div>
 legend.onAdd = function (map) {
 const div = L.DomUtil.create('div', 'info legend');
-const grades = [0, 25,0000, 50,000, 100,000];
+const grades = [0, 250000, 50000, 100000];
 const labels = [];
 let from, to;
 for (let i = 0; i < grades.length; i++) {
