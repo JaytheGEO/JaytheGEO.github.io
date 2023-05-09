@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>My first map</title>
+  <title>Final Project</title>
   
   <script type="text/javascript" src="city.js"></script>
   <script src="city.js"></script>
@@ -11,6 +11,7 @@
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
     integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
     crossorigin=""></script>
+  <script src="//cdn.jsdelivr.net/leaflet.esri/1.0.3/esri-leaflet.js"></script>
   <style>
     #map{ width: 900px; height: 500px; }
   </style>
@@ -23,12 +24,11 @@
   <script>
 
   // initialize the map
-  var map = L.map('map').setView([40.1020, -88.2272], 4);
+  var map = L.map('map').setView([43.4090, -63.5244], 2); 
 
   // load a tile layer
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+L.esri.basemapLayer('Streets').addTo(map);
+
 
 const city = L.geoJson(cities).addTo(map);    
   </script>
