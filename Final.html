@@ -48,8 +48,8 @@ info.onAdd = function (map) {
     return this._div;
 };
 	  
-info.update = function (edu) {
-	const contents = edu ? `<b>${edu.EdNorm} %</b><br />${edu.CountyName}` : 'Hover over a park';
+info.update = function (cities) {
+	const contents = cities ? `<b>${cities.population} %</b><br />${cities.name}` : 'Hover over a park';
 	this._div.innerHTML = `<h4>Population around park</h4>${contents}`;
 };
 
