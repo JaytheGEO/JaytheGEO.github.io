@@ -79,25 +79,6 @@ info.update = function (cities) {
 
 info.addTo(map);
     
-//function formats the shape color based on the attribute d's value
-
-//Choropleth Color & Classification Setting
-function getColor(population) {
-return population > 100000 ? '#BD0026' :
-population > 50000 ? '#E31A1C' :
-population > 25000 ? '#FC4E2A' :
-population > 0 ? '#FD8D3C' :
-'#FFEDA0';
-}
-function style(feature) {
-return {
-fillColor: getColor(feature.properties.population), //color by EdNorm attribute from your file
-weight: 0.5, //line weight
-opacity: 1, //line opacity
-color: 'white', //line color
-fillOpacity: 0.7 //shape file
-};
-}
 //INTERACTION - Highlight
 function highlightFeature(population) {
 const layer = population.target;
