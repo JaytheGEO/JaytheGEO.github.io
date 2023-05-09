@@ -50,7 +50,7 @@ var geojsonLayer = L.geoJSON(null, {
 			}
 		}).addTo(map);
 
-$.getJSON("city",
+$.getJSON("https://raw.githubusercontent.com/JaytheGEO/JaytheGEO.github.io/main/city.js",
  function(data) {
  
 geojsonLayer.addData(data);	
