@@ -30,7 +30,38 @@
 L.esri.basemapLayer('Streets').addTo(map);
 
 
-const city = L.geoJson(cities).addTo(map);    
+const city = L.geoJson(cities).addTo(map); 
+    
+function highlightFeature(e) {
+		var layer = e.target;
+		layer.setStyle({
+			weight: 3,
+			color: '#00ffff',
+			dashArray: '',
+			fillOpacity: 0.9
+		});
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+		app.info.update(layer.feature.properties);
+	}
+	
+	function resetHighlight(e) {
+		geojson.resetStyle(e.target);
+		app.info.update();
+	}
+
+	function zoomToFeature(e) {
+		app.map.fitBounds(e.target.getBounds());
+	}
+	
+	function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			click: zoomToFeature
+		});
+	}  
   </script>
 </body>
 </html>
