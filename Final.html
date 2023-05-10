@@ -63,27 +63,27 @@ info.onAdd = function (map) {
     this.update();
     return this._div;
 };
-
+ 
 info.update = function (IllioisGJSON) {
-	const contents = IllioisGJSON ? `<b>${IllioisGJSON.Clean_data_TotalPop} %</b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
-	this._div.innerHTML = `<h4>County population</h4>${contents}`;
+	const contents = IllioisGJSON ? `<b>${IllioisGJSON.Clean_data_NormBach} %</b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
+	this._div.innerHTML = `<h4>Population with Bachelor's Degree</h4>${contents}`;
 };
 
 info.addTo(map);
-
+    
 //function formats the shape color based on the attribute d's value
 
 //Choropleth Color & Classification Setting
-function getColor(Clean_data_TotalPop) {
-return Clean_data_TotalPop > 8000 ? '#BD0026' :
-Clean_data_TotalPop > 5000 ? '#E31A1C' :
-Clean_data_TotalPop > 2000 ? '#FC4E2A' :
-Clean_data_TotalPop > 0 ? '#FD8D3C' :
+function getColor(Clean_data_NormBach) {
+return Clean_data_NormBach > 35.19 ? '#BD0026' :
+Clean_data_NormBach > 22.91 ? '#E31A1C' :
+Clean_data_NormBach > 12.87 ? '#FC4E2A' :
+Clean_data_NormBach > 0 ? '#FD8D3C' :
 '#FFEDA0';
 }
 function style(feature) {
 return {
-fillColor: getColor(feature.properties.Clean_data_TotalPop), //color by EdNorm attribute from your file
+fillColor: getColor(feature.properties.Clean_data_NormBach), //color by EdNorm attribute from your file
 weight: 0.5, //line weight
 opacity: 1, //line opacity
 color: 'white', //line color
@@ -91,13 +91,13 @@ fillOpacity: 0.7 //shape file
 };
 }
 //INTERACTION - Highlight
-function highlightFeature(Clean_data_TotalPop) {
-const layer = Clean_data_TotalPop.target;
+function highlightFeature(Clean_data_NormBach) {
+const layer = Clean_data_NormBach.target;
 layer.setStyle({
 weight: 5,
 color: '#666',
-Expand All
-	@@ -110,38 +102,44 @@
+dashArray: '',
+fillOpacity: 0.7
 }); 
 layer.bringToFront();
 info.update(layer.feature.properties);
@@ -107,12 +107,12 @@ style,
 onEachFeature
 }).addTo(map);
 
-function resetHighlight(Clean_data_TotalPop) {
-geojson.resetStyle(Clean_data_TotalPop.target);
+function resetHighlight(Clean_data_NormBach) {
+geojson.resetStyle(Clean_data_NormBach.target);
 info.update();
 }
-function zoomToFeature(Clean_data_TotalPop) {
-map.fitBounds(Clean_data_TotalPop.target.getBounds());
+function zoomToFeature(Clean_data_NormBach) {
+map.fitBounds(Clean_data_NormBach.target.getBounds());
 }
 function onEachFeature(feature, layer) {
 layer.on({
@@ -127,7 +127,7 @@ const legend = L.control({position: 'bottomright'});
 //adds the legend to the map in a <div>
 legend.onAdd = function (map) {
 const div = L.DomUtil.create('div', 'info legend');
-const grades = [0, 2000, 5000, 8000];
+const grades = [0, 12.87, 22.91, 35.19];
 const labels = [];
 let from, to;
 for (let i = 0; i < grades.length; i++) {
