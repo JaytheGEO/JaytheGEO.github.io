@@ -56,7 +56,7 @@ $.getJSON("https://raw.githubusercontent.com/JaytheGEO/JaytheGEO.github.io/main/
 geojsonLayer.addData(data);	
 	
 var heatData = [];
-	geojsonLayer.eachLayer(function(layer) {
+	geojsonLayer.eachLayer(function(population) {
 		var latlng = layer.getLatLng();
 		var value = layer.value;
 		heatData.push([latlng.lat, latlng.lng, value]);
