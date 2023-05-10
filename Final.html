@@ -43,41 +43,6 @@ width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
   // initialize the map
    var map = L.map('map').setView([40, -89], 6); 
 	  
-// Load the GeoJSON data
-  fetch("city.geojson")
-    .then(response => response.json())
-    .then(data => {
-      // Define the circle marker style
-      var circleMarkerOptions = {
-        radius: 6,
-        fillColor: "#ff7800",
-        color: "#000",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.8
-      };
-
-      // Create a new GeoJSON layer with circle markers
-      var geojsonLayer = L.geoJSON(data, {
-        pointToLayer: function (feature, latlng) {
-          return L.circleMarker(latlng, circleMarkerOptions);
-        }
-      });
-
-      // Add the layer to the map
-      geojsonLayer.addTo(map);
-
-      // Set up event listeners to change the circle marker color on mouseover/mouseout
-      geojsonLayer.eachLayer(function(layer) {
-        layer.on('mouseover', function () {
-          this.setStyle({fillColor: 'blue'});
-        });
-        layer.on('mouseout', function () {
-          this.setStyle({fillColor: '#ff7800'});
-        });
-      });
-    });
-	  
 	  
   // load a tile layer
 L.esri.basemapLayer('Streets').addTo(map);
