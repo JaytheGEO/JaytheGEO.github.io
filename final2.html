@@ -1,16 +1,15 @@
 <html>
 <head>
-  <title>final</title>
+  <title>Final</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
      crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
     integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
     crossorigin=""></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="leaflet-heat.js"></script>	
-<script src="//cdn.jsdelivr.net/leaflet.esri/1.0.3/esri-leaflet.js"></script>
-    <style>
+	
+    <script src="//cdn.jsdelivr.net/leaflet.esri/1.0.3/esri-leaflet.js"></script>
+   <style>
 .info {
     padding: 6px 8px;
     font: 14px/16px Arial, Helvetica, sans-serif;
@@ -30,21 +29,28 @@ text-align: left; line-height: 18px; color: #555; }
 width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }	  
 
 </style>
+ 
+  
   <style>
+ 
     #map{ width: 800px; height: 600px; }
   </style>
- 
 </head>
+
 <body>
+
   <div id="map"></div>
 <script type="text/javascript" src="city.js"></script>
-<script type="text/javascript" src="Lab2.js"></script>	
+<script type="text/javascript" src="secondEd.geojson"></script>
   <script>
+
   // initialize the map
-   var map = L.map('map').setView([40, -89], 4); 
+  var map = L.map('map').setView([40, -89], 4);
+
+ 
   // load a tile layer
 L.esri.basemapLayer('Streets').addTo(map);
-
+	  	  	  
 
 var popup = L.popup();
 
@@ -56,7 +62,7 @@ function onMapClick(e) {
 }
 
 map.on('click', onMapClick);
-
+	  
 var info = L.control();
 
 info.onAdd = function (map) {
@@ -64,36 +70,18 @@ info.onAdd = function (map) {
     this.update();
     return this._div;
 };
+
  
-info.update = function (IllioisGJSON) {
-	const contents = IllioisGJSON ? `<b>${IllioisGJSON.Clean_data_TotalPop} %</b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
-	this._div.innerHTML = `<h4>County population</h4>${contents}`;
+info.update = function (cities) {
+	const contents = cities ? `<b>${cities.population} </b><br />${cities.name}` : 'Hover over a park';
+	this._div.innerHTML = `<h4>Population around park</h4>${contents}`;
 };
 
 info.addTo(map);
     
-//function formats the shape color based on the attribute d's value
-
-//Choropleth Color & Classification Setting
-function getColor(Clean_data_TotalPop) {
-return Clean_data_TotalPop > 8000 ? '#BD0026' :
-Clean_data_TotalPop > 5000 ? '#E31A1C' :
-Clean_data_TotalPop > 2000 ? '#FC4E2A' :
-Clean_data_TotalPop > 0 ? '#FD8D3C' :
-'#FFEDA0';
-}
-function style(feature) {
-return {
-fillColor: getColor(feature.properties.Clean_data_TotalPop), //color by EdNorm attribute from your file
-weight: 0.5, //line weight
-opacity: 1, //line opacity
-color: 'white', //line color
-fillOpacity: 0.7 //shape file
-};
-}
 //INTERACTION - Highlight
-function highlightFeature(Clean_data_TotalPop) {
-const layer = Clean_data_TotalPop.target;
+function highlightFeature(population) {
+const layer = population.target;
 layer.setStyle({
 weight: 5,
 color: '#666',
@@ -103,17 +91,17 @@ fillOpacity: 0.7
 layer.bringToFront();
 info.update(layer.feature.properties);
 }
-const geojson = L.geoJson(IllioisGJSON, {
+const city = L.geoJson(cities, {
 style,
 onEachFeature
 }).addTo(map);
 
-function resetHighlight(Clean_data_TotalPop) {
-geojson.resetStyle(Clean_data_TotalPop.target);
+function resetHighlight(population) {
+geojson.resetStyle(population.target);
 info.update();
 }
-function zoomToFeature(Clean_data_TotalPop) {
-map.fitBounds(Clean_data_TotalPop.target.getBounds());
+function zoomToFeature(population) {
+map.fitBounds(population.target.getBounds());
 }
 function onEachFeature(feature, layer) {
 layer.on({
@@ -128,7 +116,7 @@ const legend = L.control({position: 'bottomright'});
 //adds the legend to the map in a <div>
 legend.onAdd = function (map) {
 const div = L.DomUtil.create('div', 'info legend');
-const grades = [0, 2000, 5000, 8000];
+const grades = [0, 250000, 50000, 100000];
 const labels = [];
 let from, to;
 for (let i = 0; i < grades.length; i++) {
