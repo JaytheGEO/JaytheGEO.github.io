@@ -63,14 +63,14 @@ info.onAdd = function (map) {
     this.update();
     return this._div;
 };
- 
+
 info.update = function (IllioisGJSON) {
 	const contents = IllioisGJSON ? `<b>${IllioisGJSON.Clean_data_TotalPop} %</b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
 	this._div.innerHTML = `<h4>County population</h4>${contents}`;
 };
 
 info.addTo(map);
-    
+
 //function formats the shape color based on the attribute d's value
 
 //Choropleth Color & Classification Setting
@@ -96,8 +96,8 @@ const layer = Clean_data_TotalPop.target;
 layer.setStyle({
 weight: 5,
 color: '#666',
-dashArray: '',
-fillOpacity: 0.7
+Expand All
+	@@ -110,38 +102,44 @@
 }); 
 layer.bringToFront();
 info.update(layer.feature.properties);
@@ -121,16 +121,13 @@ mouseout: resetHighlight,
 click: zoomToFeature
 });
 }
-	  
-const cities = L.geoJson(cities).addTo(map);
-	  
 // LEGEND
 //locates the legend in the bottom right of the map
 const legend = L.control({position: 'bottomright'});
 //adds the legend to the map in a <div>
 legend.onAdd = function (map) {
 const div = L.DomUtil.create('div', 'info legend');
-const grades = [0, 2000, 5000, 8000];
+const grades = [0, 2000, 3500, 5000];
 const labels = [];
 let from, to;
 for (let i = 0; i < grades.length; i++) {
