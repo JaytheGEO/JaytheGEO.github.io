@@ -41,10 +41,46 @@ width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
 <script type="text/javascript" src="Lab2.js"></script>	
   <script>
   // initialize the map
-   var map = L.map('map').setView([40, -89], 4); 
+   var map = L.map('map').setView([40, -89], 6); 
+	  
+// Load the GeoJSON data
+  fetch("city.geojson")
+    .then(response => response.json())
+    .then(data => {
+      // Define the circle marker style
+      var circleMarkerOptions = {
+        radius: 6,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      };
+
+      // Create a new GeoJSON layer with circle markers
+      var geojsonLayer = L.geoJSON(data, {
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, circleMarkerOptions);
+        }
+      });
+
+      // Add the layer to the map
+      geojsonLayer.addTo(map);
+
+      // Set up event listeners to change the circle marker color on mouseover/mouseout
+      geojsonLayer.eachLayer(function(layer) {
+        layer.on('mouseover', function () {
+          this.setStyle({fillColor: 'blue'});
+        });
+        layer.on('mouseout', function () {
+          this.setStyle({fillColor: '#ff7800'});
+        });
+      });
+    });
+	  
+	  
   // load a tile layer
 L.esri.basemapLayer('Streets').addTo(map);
-
 
 var popup = L.popup();
 
@@ -67,7 +103,7 @@ info.onAdd = function (map) {
  
 info.update = function (IllioisGJSON) {
 	const contents = IllioisGJSON ? `<b>${IllioisGJSON.Clean_data_TotalPop} %</b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
-	this._div.innerHTML = `<h4>County population</h4>${contents}`;
+	this._div.innerHTML = `<h4>County Population</h4>${contents}`;
 };
 
 info.addTo(map);
@@ -76,8 +112,8 @@ info.addTo(map);
 
 //Choropleth Color & Classification Setting
 function getColor(Clean_data_TotalPop) {
-return Clean_data_TotalPop > 8000 ? '#BD0026' :
-Clean_data_TotalPop > 5000 ? '#E31A1C' :
+return Clean_data_TotalPop > 4000 ? '#BD0026' :
+Clean_data_TotalPop > 3000 ? '#E31A1C' :
 Clean_data_TotalPop > 2000 ? '#FC4E2A' :
 Clean_data_TotalPop > 0 ? '#FD8D3C' :
 '#FFEDA0';
@@ -128,7 +164,7 @@ const legend = L.control({position: 'bottomright'});
 //adds the legend to the map in a <div>
 legend.onAdd = function (map) {
 const div = L.DomUtil.create('div', 'info legend');
-const grades = [0, 2000, 5000, 8000];
+const grades = [0, 2000, 3000, 4000];
 const labels = [];
 let from, to;
 for (let i = 0; i < grades.length; i++) {
