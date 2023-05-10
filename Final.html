@@ -38,70 +38,62 @@ width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
 <body>
   <div id="map"></div>
 <script type="text/javascript" src="city.js"></script>
+<script type="text/javascript" src="Lab2.js"></script>	
   <script>
   // initialize the map
    var map = L.map('map').setView([40, -89], 4); 
   // load a tile layer
 L.esri.basemapLayer('Streets').addTo(map);
 
-var geojsonLayer = L.geoJSON(null, {
-			onEachFeature: function(feature, layer) {
-				// Optional: add popups or other interactions to each feature
-			}
-		}).addTo(map);
 
-$.getJSON("https://raw.githubusercontent.com/JaytheGEO/JaytheGEO.github.io/main/city.js",
- function(data) {
- 
-geojsonLayer.addData(data);	
-	
-var heatData = [];
-	geojsonLayer.eachLayer(function(layer) {
-		var latlng = layer.getLatLng(coordinates);
-		var value = layer.value;
-		heatData.push([latlng.lat, latlng.lng, value]);
-	});
-	
-var heatLayer = L.heatLayer(heatData, {
-				radius: 100,
-				blur: 10,
-				opacity: 1,
-				maxZoom: 17,
-				max: 4.0,
-				
-				gradient: {
-					0.0: 'green',
-					0.5: 'yellow',
-					1.0: 'red'}
-        
-			}).addTo(map);
-		});	
-	  
 var popup = L.popup();
+
 function onMapClick(e) {
     popup
         .setLatLng(e.latlng)
         .setContent("You clicked the map at " + e.latlng.toString())
         .openOn(map);
 }
+
 map.on('click', onMapClick);
-	  
+
 var info = L.control();
+
 info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
     this.update();
     return this._div;
 };
-	  
-info.update = function (cities) {
-	const contents = cities ? `<b>${cities.population} %</b><br />${cities.name}` : 'Hover over a park';
-	this._div.innerHTML = `<h4>Population around park</h4>${contents}`;
+ 
+info.update = function (IllioisGJSON) {
+	const contents = IllioisGJSON ? `<b>${IllioisGJSON.Clean_data_TotalPop} %</b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
+	this._div.innerHTML = `<h4>County population</h4>${contents}`;
 };
-info.addTo(map);	
-	  
+
+info.addTo(map);
+    
+//function formats the shape color based on the attribute d's value
+
+//Choropleth Color & Classification Setting
+function getColor(Clean_data_TotalPop) {
+return Clean_data_TotalPop > 8000 ? '#BD0026' :
+Clean_data_TotalPop > 5000 ? '#E31A1C' :
+Clean_data_TotalPop > 2000 ? '#FC4E2A' :
+Clean_data_TotalPop > 0 ? '#FD8D3C' :
+'#FFEDA0';
+}
+function style(feature) {
+return {
+fillColor: getColor(feature.properties.Clean_data_TotalPop), //color by EdNorm attribute from your file
+weight: 0.5, //line weight
+opacity: 1, //line opacity
+color: 'white', //line color
+fillOpacity: 0.7 //shape file
+};
+}
 //INTERACTION - Highlight
-function highlightFeature(population) {
-const layer = population.target;
+function highlightFeature(Clean_data_TotalPop) {
+const layer = Clean_data_TotalPop.target;
 layer.setStyle({
 weight: 5,
 color: '#666',
@@ -110,38 +102,44 @@ fillOpacity: 0.7
 }); 
 layer.bringToFront();
 info.update(layer.feature.properties);
-}	  
-const city = L.geoJson(cities).addTo(map); 
-    
-function highlightFeature(population) {
-		var layer = population.target;
-		layer.setStyle({
-			weight: 3,
-			color: '#00ffff',
-			dashArray: '',
-			fillOpacity: 0.9
-		});
-		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-			layer.bringToFront();
-		}
-		app.info.update(layer.feature.properties);
-	}
-	
-	function resetHighlight(population) {
-		geojson.resetStyle(population.target);
-		app.info.update();
-	}
-	function zoomToFeature(population) {
-		app.map.fitBounds(population.target.getBounds());
-	}
-	
-	function onEachFeature(feature, layer) {
-		layer.on({
-			mouseover: highlightFeature,
-			mouseout: resetHighlight,
-			click: zoomToFeature
-		});
-	}  
-  </script>
+}
+const geojson = L.geoJson(IllioisGJSON, {
+style,
+onEachFeature
+}).addTo(map);
+
+function resetHighlight(Clean_data_TotalPop) {
+geojson.resetStyle(Clean_data_TotalPop.target);
+info.update();
+}
+function zoomToFeature(Clean_data_TotalPop) {
+map.fitBounds(Clean_data_TotalPop.target.getBounds());
+}
+function onEachFeature(feature, layer) {
+layer.on({
+mouseover: highlightFeature,
+mouseout: resetHighlight,
+click: zoomToFeature
+});
+}
+// LEGEND
+//locates the legend in the bottom right of the map
+const legend = L.control({position: 'bottomright'});
+//adds the legend to the map in a <div>
+legend.onAdd = function (map) {
+const div = L.DomUtil.create('div', 'info legend');
+const grades = [0, 2000, 5000, 8000];
+const labels = [];
+let from, to;
+for (let i = 0; i < grades.length; i++) {
+from = grades[i];
+to = grades[i + 1];
+labels.push(`<i style="background:${getColor(from + 1)}"></i> ${from}${to ? `&ndash;${to}` : '+'}`+'%');
+}
+div.innerHTML = labels.join('<br>');
+return div;
+};
+legend.addTo(map);
+</script>
 </body>
 </html>
