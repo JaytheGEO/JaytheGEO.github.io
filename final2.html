@@ -1,133 +1,69 @@
+<!DOCTYPE html>
 <html>
 <head>
-  <title>Final</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-     integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
-     crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
-    crossorigin=""></script>
-	
-    <script src="//cdn.jsdelivr.net/leaflet.esri/1.0.3/esri-leaflet.js"></script>
-   <style>
-.info {
-    padding: 6px 8px;
-    font: 14px/16px Arial, Helvetica, sans-serif;
-    background: white;
-    background: rgba(255,255,255,0.8);
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    border-radius: 5px;
-}
-.info h4 {
-    margin: 0 0 5px;
-    color: #777;
-}
+  <title>Leaflet GeoJSON Example</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-.legend {
-text-align: left; line-height: 18px; color: #555; }
-.legend i {
-width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }	  
+  <!-- Load Leaflet from CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
-</style>
- 
-  
   <style>
- 
-    #map{ width: 800px; height: 600px; }
+    #map {
+      height: 500px;
+    }
   </style>
 </head>
-
 <body>
 
-  <div id="map"></div>
-<script type="text/javascript" src="city.js"></script>
-<script type="text/javascript" src="secondEd.geojson"></script>
-  <script>
+<div id="map"></div>
 
-  // initialize the map
-  var map = L.map('map').setView([40, -89], 4);
+<script>
+  // Initialize the map
+  var map = L.map('map').setView([37.8, -96], 4);
 
- 
-  // load a tile layer
-L.esri.basemapLayer('Streets').addTo(map);
-	  	  	  
+  // Load the GeoJSON data
+  fetch("cities.geojson")
+    .then(response => response.json())
+    .then(data => {
+      // Define the circle marker style
+      var circleMarkerOptions = {
+        radius: 6,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      };
 
-var popup = L.popup();
+      // Create a new GeoJSON layer with circle markers
+      var geojsonLayer = L.geoJSON(data, {
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, circleMarkerOptions);
+        }
+      });
 
-function onMapClick(e) {
-    popup
-        .setLatLng(e.latlng)
-        .setContent("You clicked the map at " + e.latlng.toString())
-        .openOn(map);
-}
+      // Add the layer to the map
+      geojsonLayer.addTo(map);
 
-map.on('click', onMapClick);
-	  
-var info = L.control();
+      // Set up event listeners to change the circle marker color on mouseover/mouseout
+      geojsonLayer.eachLayer(function(layer) {
+        layer.on('mouseover', function () {
+          this.setStyle({fillColor: 'blue'});
+        });
+        layer.on('mouseout', function () {
+          this.setStyle({fillColor: '#ff7800'});
+        });
+      });
+    });
 
-info.onAdd = function (map) {
-    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-    this.update();
-    return this._div;
-};
-
- 
-info.update = function (cities) {
-	const contents = cities ? `<b>${cities.population} </b><br />${cities.name}` : 'Hover over a park';
-	this._div.innerHTML = `<h4>Population around park</h4>${contents}`;
-};
-
-info.addTo(map);
-    
-//INTERACTION - Highlight
-function highlightFeature(population) {
-const layer = population.target;
-layer.setStyle({
-weight: 5,
-color: '#666',
-dashArray: '',
-fillOpacity: 0.7
-}); 
-layer.bringToFront();
-info.update(layer.feature.properties);
-}
-const city = L.geoJson(cities, {
-style,
-onEachFeature
-}).addTo(map);
-
-function resetHighlight(population) {
-geojson.resetStyle(population.target);
-info.update();
-}
-function zoomToFeature(population) {
-map.fitBounds(population.target.getBounds());
-}
-function onEachFeature(feature, layer) {
-layer.on({
-mouseover: highlightFeature,
-mouseout: resetHighlight,
-click: zoomToFeature
-});
-}
-// LEGEND
-//locates the legend in the bottom right of the map
-const legend = L.control({position: 'bottomright'});
-//adds the legend to the map in a <div>
-legend.onAdd = function (map) {
-const div = L.DomUtil.create('div', 'info legend');
-const grades = [0, 250000, 50000, 100000];
-const labels = [];
-let from, to;
-for (let i = 0; i < grades.length; i++) {
-from = grades[i];
-to = grades[i + 1];
-labels.push(`<i style="background:${getColor(from + 1)}"></i> ${from}${to ? `&ndash;${to}` : '+'}`+'%');
-}
-div.innerHTML = labels.join('<br>');
-return div;
-};
-legend.addTo(map);
+  // Add a tile layer to the map
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+  }).addTo(map);
 </script>
+
 </body>
 </html>
+
