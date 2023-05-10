@@ -44,7 +44,6 @@ width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
    var map = L.map('map').setView([40, -89], 6); 
   // load a tile layer
 L.esri.basemapLayer('Streets').addTo(map);
-const cities = L.geoJson(cities).addTo(map);
 
 var popup = L.popup();
 
@@ -122,6 +121,9 @@ mouseout: resetHighlight,
 click: zoomToFeature
 });
 }
+	  
+const cities = L.geoJson(cities).addTo(map);
+	  
 // LEGEND
 //locates the legend in the bottom right of the map
 const legend = L.control({position: 'bottomright'});
