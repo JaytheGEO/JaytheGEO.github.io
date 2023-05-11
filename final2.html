@@ -23,8 +23,11 @@
   // Initialize the map
   var map = L.map('map').setView([37.8, -96], 4);
 
-   // Load the GeoJSON data
-  fetch("city.geojson")
+  // Initialize the map
+  var map = L.map('map').setView([37.8, -96], 4);
+
+  // Load the GeoJSON data
+  fetch("cities.geojson")
     .then(response => response.json())
     .then(data => {
       // Define the circle marker style
@@ -64,5 +67,7 @@
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
   }).addTo(map);
+</script>
+</body>  
 </html>
 
