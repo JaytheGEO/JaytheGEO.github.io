@@ -18,13 +18,13 @@
 <body>
 
 <div id="map"></div>
-<script type="text/javascript" src="city.js"></script>
+
 <script>
   // Initialize the map
   var map = L.map('map').setView([37.8, -96], 4);
 
   // Load the GeoJSON data
-  fetch("city.js")
+  fetch("cities.geojson")
     .then(response => response.json())
     .then(data => {
       // Define the circle marker style
@@ -40,7 +40,9 @@
       // Create a new GeoJSON layer with circle markers
       var geojsonLayer = L.geoJSON(data, {
         pointToLayer: function (feature, latlng) {
-          return L.circleMarker(latlng, circleMarkerOptions);
+          var marker = L.circleMarker(latlng, circleMarkerOptions);
+          marker.bindPopup(feature.properties.name); // Add popup that displays the "name" property
+          return marker;
         }
       });
 
@@ -66,4 +68,3 @@
 
 </body>
 </html>
-

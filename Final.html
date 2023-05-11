@@ -41,42 +41,7 @@ width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
 <script type="text/javascript" src="Lab2.js"></script>	
   <script>
   // initialize the map
-   var map = L.map('map').setView([40, -89], 6); 
-	  
-// Load the GeoJSON data
-  fetch("city.geojson")
-    .then(response => response.json())
-    .then(data => {
-      // Define the circle marker style
-      var circleMarkerOptions = {
-        radius: 6,
-        fillColor: "#ff7800",
-        color: "#000",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.8
-      };
-
-      // Create a new GeoJSON layer with circle markers
-      var geojsonLayer = L.geoJSON(data, {
-        pointToLayer: function (feature, latlng) {
-          return L.circleMarker(latlng, circleMarkerOptions);
-        }
-      });
-
-      // Add the layer to the map
-      geojsonLayer.addTo(map);
-
-      // Set up event listeners to change the circle marker color on mouseover/mouseout
-      geojsonLayer.eachLayer(function(layer) {
-        layer.on('mouseover', function () {
-          this.setStyle({fillColor: 'blue'});
-        });
-        layer.on('mouseout', function () {
-          this.setStyle({fillColor: '#ff7800'});
-        });
-      });
-    });
+   var map = L.map('map').setView([41.9, -87.6], 10); 
 	  
 	  
   // load a tile layer
@@ -102,7 +67,7 @@ info.onAdd = function (map) {
 };
  
 info.update = function (IllioisGJSON) {
-	const contents = IllioisGJSON ? `<b>${IllioisGJSON.Clean_data_TotalPop} %</b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
+	const contents = IllioisGJSON ? `<b>${IllioisGJSON.Clean_data_TotalPop} </b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
 	this._div.innerHTML = `<h4>County Population</h4>${contents}`;
 };
 
@@ -112,10 +77,10 @@ info.addTo(map);
 
 //Choropleth Color & Classification Setting
 function getColor(Clean_data_TotalPop) {
-return Clean_data_TotalPop > 4000 ? '#BD0026' :
-Clean_data_TotalPop > 3000 ? '#E31A1C' :
-Clean_data_TotalPop > 2000 ? '#FC4E2A' :
-Clean_data_TotalPop > 0 ? '#FD8D3C' :
+return Clean_data_TotalPop > 4000 ? '#ff0000' :
+Clean_data_TotalPop > 3000 ? '#ff7f00' :
+Clean_data_TotalPop > 2000 ? '#ffff00' :
+Clean_data_TotalPop > 0 ? '#7fff00' :
 '#FFEDA0';
 }
 function style(feature) {
@@ -158,6 +123,48 @@ mouseout: resetHighlight,
 click: zoomToFeature
 });
 }
+	  
+// Load the GeoJSON data
+  fetch("cities.geojson")
+    .then(response => response.json())
+    .then(data => {
+      // Define the circle marker style
+      var circleMarkerOptions = {
+        radius: 6,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.8
+      };
+
+      // Create a new GeoJSON layer with circle markers
+      var geojsonLayer = L.geoJSON(data, {
+        pointToLayer: function (feature, latlng) {
+          var marker = L.circleMarker(latlng, circleMarkerOptions);
+          marker.bindPopup(feature.properties.name); // Add popup that displays the "name" property
+          return marker;
+        }
+      });
+
+      // Add the layer to the map
+      geojsonLayer.addTo(map);
+
+      // Set up event listeners to change the circle marker color on mouseover/mouseout
+      geojsonLayer.eachLayer(function(layer) {
+        layer.on('mouseover', function () {
+          this.setStyle({fillColor: 'blue'});
+        });
+        layer.on('mouseout', function () {
+          this.setStyle({fillColor: '#ff7800'});
+        });
+      });
+    });	  
+	
+  
+	  
+	  
+	  
 // LEGEND
 //locates the legend in the bottom right of the map
 const legend = L.control({position: 'bottomright'});
@@ -170,7 +177,7 @@ let from, to;
 for (let i = 0; i < grades.length; i++) {
 from = grades[i];
 to = grades[i + 1];
-labels.push(`<i style="background:${getColor(from + 1)}"></i> ${from}${to ? `&ndash;${to}` : '+'}`+'%');
+labels.push(`<i style="background:${getColor(from + 1)}"></i> ${from}${to ? `&ndash;${to}` : '+'}`+'');
 }
 div.innerHTML = labels.join('<br>');
 return div;
