@@ -77,10 +77,10 @@ info.addTo(map);
 
 //Choropleth Color & Classification Setting
 function getColor(Clean_data_TotalPop) {
-return Clean_data_TotalPop > 4000 ? '#ffbdbd' :
-Clean_data_TotalPop > 3000 ? '#f1cbff' :
-Clean_data_TotalPop > 2000 ? '#c9c9ff' :
-Clean_data_TotalPop > 0 ? '#e1f7d5' :
+return Clean_data_TotalPop > 4000 ? '#ff0000' :
+Clean_data_TotalPop > 3000 ? '#ff7f00' :
+Clean_data_TotalPop > 2000 ? '#ffff00' :
+Clean_data_TotalPop > 0 ? '#7fff00' :
 '#FFEDA0';
 }
 function style(feature) {
@@ -177,7 +177,7 @@ let from, to;
 for (let i = 0; i < grades.length; i++) {
 from = grades[i];
 to = grades[i + 1];
-labels.push(`<i style="background:${getColor(from + 1)}"></i> ${from}${to ? `&ndash;${to}` : '+'}`+'%');
+labels.push(`<i style="background:${getColor(from + 1)}"></i> ${from}${to ? `&ndash;${to}` : '+'}`+'');
 }
 div.innerHTML = labels.join('<br>');
 return div;
