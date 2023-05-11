@@ -38,33 +38,125 @@
       };
 
       // Create a new GeoJSON layer with circle markers
-      var geojsonLayer = L.geoJSON(data, {
-        pointToLayer: function (feature, latlng) {
-          var marker = L.circleMarker(latlng, circleMarkerOptions);
-          marker.bindPopup(feature.properties.name); // Add popup that displays the "name" property
-          return marker;
-        }
-      });
+      var geojso<!doctype html>
+<html>
+<head>
+    <!--Step 2-->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+<body>
+<!--Step 2-->
+<svg width="1000" height="800"></svg>
+<script>
+        
+        // Step 3
+        var svg = d3.select("svg"),
+            margin = 200,
+            width = svg.attr("width") - margin, //300
+            height = svg.attr("height") - margin //200
 
-      // Add the layer to the map
-      geojsonLayer.addTo(map);
+        // Step 4 
+        var xScale = d3.scaleLinear().domain([0, 10]).range([0, width]),
+            yScale = d3.scaleLinear().domain([0, 800000]).range([height, 0]);
+            
+        var g = svg.append("g")
+            .attr("transform", "translate(" + 100 + "," + 100 + ")");
 
-      // Set up event listeners to change the circle marker color on mouseover/mouseout
-      geojsonLayer.eachLayer(function(layer) {
-        layer.on('mouseover', function () {
-          this.setStyle({fillColor: 'blue'});
+        // Step 5
+        // Title
+        svg.append('text')
+        .attr('x', width/2 + 100)
+        .attr('y', 100)
+        .attr('text-anchor', 'middle')
+        .style('font-famil', 'Franklin Gothic Medium')
+        .style('font-size', 40)
+        .text('Title: Scatter Plot');
+        
+        // X label
+        svg.append('text')
+        .attr('x', width/2 + 100)
+        .attr('y', height - 15 + 150)
+        .attr('text-anchor', 'left')
+        .style('font-family', 'Franklin Gothic Medium')
+        .style('font-size', 18)
+        .text('Severity (Independant)');
+        
+        // Y label
+        svg.append('text')
+        .attr('text-anchor', 'left')
+        .attr('transform', 'translate(60,' + height + ')rotate(-90)')
+        .style('font-family', 'Franklin Gothic Medium')
+        .style('font-size', 18)
+        .text('Count of Accidents(Dependant)');
+
+        // Step 6
+        g.append("g")
+         .attr("transform", "translate(0," + height + ")")
+         .call(d3.axisBottom(xScale));
+        
+        g.append("g")
+         .call(d3.axisLeft(yScale));
+    
+    //NEW
+    // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+  // Its opacity is set to 0: we don't see it by default.
+  var tooltip = d3.select("#my_dataviz")
+    .append("div")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+    .style("background-color", "red")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "10px")
+
+
+
+  // A function that change this tooltip when the user hover a point.
+  // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+  var mouseover = function(d) {
+    tooltip
+      .style("opacity", 1)
+  }
+
+  var mousemove = function(d) {
+    tooltip
+      .html("The state is: " + d.State)
+      .style("left", (d3.mouse(this)[0]+90) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+      .style("top", (d3.mouse(this)[1]) + "px")
+  }
+
+  // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+  var mouseleave = function(d) {
+    tooltip
+      .transition()
+      .duration(200)
+      .style("opacity", 0)
+  }
+
+
+    
+    //NEW END
+      
+        
+        //Load data and create scatter plot 
+         d3.csv("Clean_data.csv", function(data) {
+            console.log(data);
+
+            // Step 7
+            svg.append('g')
+            .selectAll("dot")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("cx", d=> xScale(d.Severity))
+            .attr("cy", d=> yScale(d.Accidents))
+            .attr("r", 2)
+            .attr("transform", "translate(" + 100 + "," + 100 + ")")
+            .style("fill", "#00cccc");
         });
-        layer.on('mouseout', function () {
-          this.setStyle({fillColor: '#ff7800'});
-        });
-      });
-    });
 
-  // Add a tile layer to the map
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-  }).addTo(map);
+  
 </script>
-
 </body>
 </html>
