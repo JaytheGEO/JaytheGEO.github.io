@@ -4,7 +4,7 @@
   <title>Leaflet GeoJSON Example</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<script type="text/javascript" src="city.js"></script>
   <!-- Load Leaflet from CDN -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
@@ -24,7 +24,7 @@
   var map = L.map('map').setView([37.8, -96], 4);
 
   // Load the GeoJSON data
-  fetch("cities.geojson")
+  fetch("cities.js")
     .then(response => response.json())
     .then(data => {
       // Define the circle marker style
