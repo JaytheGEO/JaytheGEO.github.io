@@ -1,44 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Leaflet GeoJSON Example</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Load Leaflet from CDN -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-
-  <style>
-    #map {
-      height: 500px;
-    }
-  </style>
-</head>
-<body>
-
-<div id="map"></div>
-
-<script>
-  // Initialize the map
-  var map = L.map('map').setView([37.8, -96], 4);
-
-  // Load the GeoJSON data
-  fetch("cities.geojson")
-    .then(response => response.json())
-    .then(data => {
-      // Define the circle marker style
-      var circleMarkerOptions = {
-        radius: 6,
-        fillColor: "#ff7800",
-        color: "#000",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.8
-      };
-
-      // Create a new GeoJSON layer with circle markers
-      var geojso<!doctype html>
+<!doctype html>
 <html>
 <head>
     <!--Step 2-->
@@ -140,7 +100,7 @@
       
         
         //Load data and create scatter plot 
-         d3.csv("Clean_data.csv", function(data) {
+         d3.csv("Clean_data.csv", function(TotalPop) {
             console.log(data);
 
             // Step 7
