@@ -125,7 +125,7 @@ click: zoomToFeature
 }
 	  
 // Load the GeoJSON data
-  fetch("city.js")
+  fetch("cities.geojson")
     .then(response => response.json())
     .then(data => {
       // Define the circle marker style
@@ -163,7 +163,7 @@ click: zoomToFeature
 	
 L.geoJSON(cities.geojson).addTo(map);	  
 	  
-L.geoJSON(geojsonlayer).addTo(map);	  
+	  
 	  
 // LEGEND
 //locates the legend in the bottom right of the map
