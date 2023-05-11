@@ -67,7 +67,7 @@ info.onAdd = function (map) {
 };
  
 info.update = function (IllioisGJSON) {
-	const contents = IllioisGJSON ? `<b>${IllioisGJSON.Clean_data_TotalPop} %</b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
+	const contents = IllioisGJSON ? `<b>${IllioisGJSON.Clean_data_TotalPop} </b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
 	this._div.innerHTML = `<h4>County Population</h4>${contents}`;
 };
 
@@ -77,10 +77,10 @@ info.addTo(map);
 
 //Choropleth Color & Classification Setting
 function getColor(Clean_data_TotalPop) {
-return Clean_data_TotalPop > 4000 ? '#BD0026' :
-Clean_data_TotalPop > 3000 ? '#E31A1C' :
-Clean_data_TotalPop > 2000 ? '#FC4E2A' :
-Clean_data_TotalPop > 0 ? '#FD8D3C' :
+return Clean_data_TotalPop > 4000 ? '#ffbdbd' :
+Clean_data_TotalPop > 3000 ? '#f1cbff' :
+Clean_data_TotalPop > 2000 ? '#c9c9ff' :
+Clean_data_TotalPop > 0 ? '#e1f7d5' :
 '#FFEDA0';
 }
 function style(feature) {
