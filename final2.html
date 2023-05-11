@@ -41,7 +41,7 @@
       var geojsonLayer = L.geoJSON(data, {
         pointToLayer: function (feature, latlng) {
           var marker = L.circleMarker(latlng, circleMarkerOptions);
-          marker.bindPopup(feature.properties.population); // Add popup that displays the "name" property
+          marker.bindPopup(feature.properties.name); // Add popup that displays the "name" property
           return marker;
         }
       });
