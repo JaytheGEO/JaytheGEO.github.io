@@ -76,7 +76,7 @@ info.addTo(map);
 //function formats the shape color based on the attribute d's value
 
 //Choropleth Color & Classification Setting
-function getColor(Clean_data_TotalPop) {
+function getColor(NormBach) {
 return Clean_data_TotalPop > 4000 ? '#ff0000' :
 Clean_data_TotalPop > 3000 ? '#ff7f00' :
 Clean_data_TotalPop > 2000 ? '#ffff00' :
@@ -85,7 +85,7 @@ Clean_data_TotalPop > 0 ? '#7fff00' :
 }
 function style(feature) {
 return {
-fillColor: getColor(feature.properties.Clean_data_TotalPop), //color by EdNorm attribute from your file
+fillColor: getColor(feature.properties.NormBach), //color by EdNorm attribute from your file
 weight: 0.5, //line weight
 opacity: 1, //line opacity
 color: 'white', //line color
