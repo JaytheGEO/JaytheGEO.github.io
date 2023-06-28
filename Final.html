@@ -41,7 +41,7 @@ width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
 <script type="text/javascript" src="Lab2.js"></script>	
   <script>
   // initialize the map
-   var map = L.map('map').setView([41.9, -87.6], 8); 
+   var map = L.map('map').setView([40.6, -89.4], 8); 
 	  
 	  
   // load a tile layer
@@ -67,7 +67,7 @@ info.onAdd = function (map) {
 };
  
 info.update = function (IllioisGJSON) {
-	const contents = IllioisGJSON ? `<b>${IllioisGJSON.NormBach} </b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
+	const contents = IllioisGJSON ? `<b>${IllioisGJSON.Clean_data_TotalPop} </b><br />${IllioisGJSON.Clean_data_CountyName}` : 'Hover over a county';
 	this._div.innerHTML = `<h4>County Population</h4>${contents}`;
 };
 
@@ -76,7 +76,7 @@ info.addTo(map);
 //function formats the shape color based on the attribute d's value
 
 //Choropleth Color & Classification Setting
-function getColor(NormBach) {
+function getColor(Clean_data_TotalPop) {
 return Clean_data_TotalPop > 4000 ? '#ff0000' :
 Clean_data_TotalPop > 3000 ? '#ff7f00' :
 Clean_data_TotalPop > 2000 ? '#ffff00' :
@@ -85,7 +85,7 @@ Clean_data_TotalPop > 0 ? '#7fff00' :
 }
 function style(feature) {
 return {
-fillColor: getColor(feature.properties.NormBach), //color by EdNorm attribute from your file
+fillColor: getColor(feature.properties.Clean_data_TotalPop), //color by EdNorm attribute from your file
 weight: 0.5, //line weight
 opacity: 1, //line opacity
 color: 'white', //line color
@@ -93,8 +93,8 @@ fillOpacity: 0.7 //shape file
 };
 }
 //INTERACTION - Highlight
-function highlightFeature(NormBach) {
-const layer = NormBach.target;
+function highlightFeature(Clean_data_TotalPop) {
+const layer = Clean_data_TotalPop.target;
 layer.setStyle({
 weight: 5,
 color: '#666',
@@ -109,12 +109,12 @@ style,
 onEachFeature
 }).addTo(map);
 
-function resetHighlight(NormBach) {
-geojson.resetStyle(NormBach.target);
+function resetHighlight(Clean_data_TotalPop) {
+geojson.resetStyle(Clean_data_TotalPop.target);
 info.update();
 }
-function zoomToFeature(NormBach) {
-map.fitBounds(NormBach.target.getBounds());
+function zoomToFeature(Clean_data_TotalPop) {
+map.fitBounds(Clean_data_TotalPop.target.getBounds());
 }
 function onEachFeature(feature, layer) {
 layer.on({
