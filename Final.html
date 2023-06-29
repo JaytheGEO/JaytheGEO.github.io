@@ -77,10 +77,10 @@ info.addTo(map);
 
 //Choropleth Color & Classification Setting
 function getColor(Clean_data_TotalPop) {
-return Clean_data_TotalPop > 4000 ? '#b2d8d8' :
-Clean_data_TotalPop > 3000 ? '#66b2b2' :
-Clean_data_TotalPop > 2000 ? '#008080' :
-Clean_data_TotalPop > 0 ? '#004c4c' :
+return Clean_data_TotalPop > 4000 ? '#004c4c' :
+Clean_data_TotalPop > 3000 ? '#008080' :
+Clean_data_TotalPop > 2000 ? '#66b2b2' :
+Clean_data_TotalPop > 0 ? '#b2d8d8' :
 '#FFEDA0';
 }
 function style(feature) {
